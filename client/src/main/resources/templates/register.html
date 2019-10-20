@@ -2,69 +2,70 @@
 <html lang="pl" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="UTF-8">
-	<title>Zarejstruj się</title>
-    <link href="../static/css/main.css" th:href="@{/css/main.css}"rel="stylesheet"/>
+	<title>Pls register</title>
+	<link href="../static/css/main.css" th:href="@{/css/main.css}" rel="stylesheet"/>
 </head>
 <body>
 <header>
 
 </header>
 <main>
-    <noscript>
-        <h2>Ta strona działą lepiej przy włączonej obsłudze javascriptu</h2>
-        <hr>
-    </noscript>
+	<noscript>
+		<h2>This website works better with javascript</h2>
+		<hr>
+	</noscript>
 
-    <h1>
-        BioZiem: Łatwe zarządzanie bibliografią!
-    </h1>
+	<h1>
+		Register to BibloZiem
+	</h1>
 
-    <!--Formularz rejstracji-->
-    <form id="register" method="post">
-        <table>
-            <tr>
-                <td>
-                    <label for="username">
-                        Nazwa użytkownika:
+	<div th:if="${warning != null}" class="error">
+		<h3>th:text="${error.text}"</h3>
+	</div>
+	<form id="register" method="post">
+		<table>
+			<tr>
+				<td>
+					<label for="username">
+						Username
+					</label>
+				</td>
+				<td>
+					<input type="text" id="username" name="username">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="password">
+						Password
+					</label>
+				</td>
+				<td>
+					<input type="password" id="password" name="password"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="validatePassword">
+						Validate password
                     </label>
-                </td>
-                <td>
-                    <input type="text" id="username" name="username">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="password">
-                        Hasło:
-                    </label>
-                </td>
-                <td>
-                    <input type="password" id="password" name="password"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="validatePassword">
-                        Potwierdź hasło:
-                    </label>
-                </td>
-                <td>
-                    <input type="password" id="validatePassword" name="validatePassword">
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <input type="submit" value="Submit">
-                    <!--
-                    <button type="submit" title="Submit" form="register">
-                        Zarejstruj
-                    </button>
-                    -->
-                </td>
-            </tr>
-        </table>
-    </form>
+				</td>
+				<td>
+					<input type="password" id="validatePassword" name="validatePassword">
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<input type="submit" value="Submit">
+					<!--
+					<button type="submit" title="Submit" form="register">
+						Zarejstruj
+					</button>
+					-->
+				</td>
+			</tr>
+		</table>
+	</form>
 
 </main>
 <footer>

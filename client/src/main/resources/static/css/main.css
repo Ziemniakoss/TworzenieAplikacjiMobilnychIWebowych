@@ -2,3 +2,16 @@ body{
 	background-color: black;
 	color: white;
 }
+input{
+    background-color: black;
+    color: white;
+    padding: 5px 5px;
+    margin: 5px 5px;
+}
+
+.error{
+    background-color: red;
+    color: yellow;
+    padding: 5px 5px;
+    margin: 5px 5px;
+}
