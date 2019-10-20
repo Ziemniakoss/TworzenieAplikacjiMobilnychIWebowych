@@ -9,6 +9,11 @@ input{
     margin: 5px 5px;
 }
 
+header{
+    background-color: #000099;
+    color: #b3b3b3;
+}
+
 .error{
     background-color: red;
     color: yellow;

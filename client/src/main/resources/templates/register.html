@@ -6,9 +6,7 @@
 	<link href="../static/css/main.css" th:href="@{/css/main.css}" rel="stylesheet"/>
 </head>
 <body>
-<header>
-
-</header>
+<div th:insert="header">...</div>
 <main>
 	<noscript>
 		<h2>This website works better with javascript</h2>
@@ -19,8 +17,8 @@
 		Register to BibloZiem
 	</h1>
 
-	<div th:if="${warning != null}" class="error">
-		<h3>th:text="${error.text}"</h3>
+	<div th:if="${error != null}" class="error">
+		<h3 th:text="${error}"> Hek</h3>
 	</div>
 	<form id="register" method="post">
 		<table>
@@ -48,7 +46,7 @@
 				<td>
 					<label for="validatePassword">
 						Validate password
-                    </label>
+					</label>
 				</td>
 				<td>
 					<input type="password" id="validatePassword" name="validatePassword">

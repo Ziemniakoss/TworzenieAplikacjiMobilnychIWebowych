@@ -24,6 +24,4 @@ sprawdzać czy dane żądanie(np o plik pdf) może zostać obsłużone.
 Serwer także po dostaniu pliku pdf musi z niego wyodrębnić dane takie jak autor i tytuł. Następnie 
 po przetworzeniu pdf serwer wysyła powiadomienie do każdej zalogowanej sesji o nowej publikacji.
 
-### Dockerfile
-
-Dockerfile jest bazowany na dostępnym na licencji GPL-2.0 [oficjalnym obrazie dockera dla MySQL Community Server ](https://github.com/docker-library/mysql/tree/6659750146b7a6b91a96c786729b4d482cf49fe6)
+Do przechowywania danych wykorzystywana jest baza danych Redis
