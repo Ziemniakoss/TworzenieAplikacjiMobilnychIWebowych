@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8">
+	<title>Welcome to BiblioZiemniak</title>
+	<link href="../static/css/main.css" th:href="@{/css/main.css}" rel="stylesheet"/>
+
+</head>
+<body>
+<div th:insert="header">...</div>
+<main>
+	<h1>Welcome to BiblioZiemniak</h1>
+
+	<p>
+		With us managing your bibliography is easy
+	</p>
+	<table>
+		<tr>
+			<th>
+				<button type="button" onclick="window.location.href = '/register'">Register</button>
+			</th>
+			<th>
+				<button type="button" onclick="window.location.href = '/login'">Login</button>
+			</th>
+		</tr>
+	</table>
+</main>
+</body>
+</html>
