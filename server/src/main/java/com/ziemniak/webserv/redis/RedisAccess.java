@@ -21,7 +21,7 @@ public abstract class RedisAccess {
             throw new NullPointerException();
         }
         Jedis j = new Jedis();
-        String key = PREFIX + user.getNick();
+        String key = PREFIX + user.getUsername();
         j.hset(key, "password", user.getPassword());
         j.close();
     }
@@ -43,7 +43,7 @@ public abstract class RedisAccess {
             return null;
         }
         User user = new User();
-        user.setNick(nick);
+        user.setUsername(nick);
         user.setPassword(stringStringMap.get("password"));
         return user;
     }
@@ -53,7 +53,7 @@ public abstract class RedisAccess {
             return;
         }
         Jedis j = new Jedis();
-        j.del(user.getNick());
+        j.del(user.getUsername());
         j.close();
     }
 

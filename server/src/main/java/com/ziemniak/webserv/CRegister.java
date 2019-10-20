@@ -2,52 +2,58 @@ package com.ziemniak.webserv;
 
 import com.ziemniak.webserv.redis.RedisAccess;
 import com.ziemniak.webserv.redis.User;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller responsible only for registering new users
+ */
 @RestController
+@CrossOrigin(origins = "http://localhost:8080")
 public class CRegister {
 
-    @RequestMapping(value = "/auth/register", method = RequestMethod.POST)
-    public RegisterResponse register(@RequestParam String nick, @RequestParam String password, @RequestParam String validatePassword){
-        StringBuilder sb = new StringBuilder();
-        boolean accepted = true;
-        System.out.println(nick+" "+password);
-        if(RedisAccess.exists(nick)){
-            accepted = false;
-            sb.append("User with this nickname already exists!");
-        }if(!password.equals(validatePassword)){
-            accepted = false;
-            if(sb.length() != 0){
-                sb.append('\n');
-            }
-            sb.append("Passwords don't match!");
-        }
-        String message;
-        if(accepted){
-            message = "Registered";
-        }else{
-            message = sb.toString();
-        }if(accepted){
-            User u  = new User();
-            u.setPassword(password);
-            u.setNick(nick);
-            RedisAccess.save(u);
-            System.out.println("Saving");
-            System.out.println(RedisAccess.exists(u.getNick()));
-        }
-        return new RegisterResponse(nick, accepted, message);
-    }
-
-    @RequestMapping(value = "/auth/register", method = RequestMethod.GET)
-    public RegisterResponse checkNick(@RequestParam String nick){
-        boolean exists = RedisAccess.exists(nick);
-        if(exists) {
-            return new RegisterResponse(nick, false, "User with given nickname already exists");
-        }else{
-            return new RegisterResponse(nick, true,"Ok");
-        }
-    }
+	/**
+	 * Registers new user only if there is no user with given
+	 * username and if passwords match each other
+	 *
+	 * @param username         username of new user
+	 * @param password         password for user
+	 * @param validatePassword same password typed second time for validation
+	 * @return ResponseEntity with code:
+	 * <ul>
+	 *     <li>200 if system registered new user</li>
+	 *     <li>400 if there is already user with this username or passwords don't match</li>
+	 * </ul>
+	 * If code == 400 ResponseEntity also has body containing errorCode:
+	 * <ul>
+	 *     <li>1 - username already exists</li>
+	 *     <li>2 - passwords don't match</li>
+	 *     <li>3 - both</li>
+	 * </ul>
+	 */
+	@PostMapping("/auth/register")
+	public ResponseEntity register(@RequestParam String username, @RequestParam String password, @RequestParam String validatePassword) {
+		int errorCode = 0;
+		System.out.println(username + " " + password);
+		if (RedisAccess.exists(username)) {
+			errorCode = 1;
+		}
+		if (!password.equals(validatePassword)) {
+			errorCode = errorCode == 0 ? 2 : 3;
+		}
+		if (errorCode == 0) {
+			User u = new User();
+			u.setPassword(password);
+			u.setUsername(username);
+			RedisAccess.save(u);
+			return new ResponseEntity(HttpStatus.OK);
+		} else {
+			String body = "{errorCode: " + errorCode + "}";
+			return new ResponseEntity(body, HttpStatus.BAD_REQUEST);
+		}
+	}
 }
