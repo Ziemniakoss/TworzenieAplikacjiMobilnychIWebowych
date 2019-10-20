@@ -1,7 +1,5 @@
-package com.ziemniak.web.redis;
+package com.ziemniak.webserv.redis;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import redis.clients.jedis.Jedis;
 
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.ziemniak.web;
+package com.ziemniak.webserv;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package com.ziemniak.web;
+package com.ziemniak.webserv;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
