@@ -1,22 +1,16 @@
 #!/bin/bash
-NETWORK_NAME=ziemniaczana_siec
+source docker_config
 
-SERV_IMG_NAME=ziem-serv
-SERV_DOCKER_NAME=ziem-serv
-SERV_IP=172.18.0.22
-SERV_PORT=42069
-
-CLI_IMG_NAME=ziem-cli
-CLI_DOCKER_NAME=ziem-cli
-CLI_IP=172.18.0.23
-CLI_PORT=8080
-SD="sudo docker"
+D=docker
 
 echo Stopowanie > /dev/null
-$SD network rm $NETWORK_NAME > /dev/null
-$SD stop $SERV_DOCKER_NAME > /dev/null
-$SD stop $CLI_DOCKER_NAME > /dev/null
-$SD rm -f $SERV_DOCKER_NAME > /dev/null
-$SD rm -f $CLI_DOCKER_NAME > /dev/null
-$SD image rm -f $SERV_IMG_NAME > /dev/null
-$SD image rm -f $CLI_IMG_NAME > /dev/null
+bash stop.sh
+echo Usuwanie kontenerów
+$D rm -f $SERV_DOCKER_NAME > /dev/null
+$D rm -f $CLI_DOCKER_NAME > /dev/null
+echo Usuwanie sieci
+$D network rm $NETWORK_NAME > /dev/null
+echo Usuwanie obrazów
+$D image rm -f $SERV_IMG_NAME > /dev/null
+$D image rm -f $CLI_IMG_NAME > /dev/null
+echo Ok

@@ -1,32 +1,38 @@
 #!/bin/bash
-NETWORK_NAME=ziemniaczana_siec
+source docker_config
 
-SERV_IMG_NAME=ziem-serv
-SERV_DOCKER_NAME=ziem-serv
-SERV_IP=172.18.0.22
-SERV_PORT=42069
-
-CLI_IMG_NAME=ziem-cli
-CLI_DOCKER_NAME=ziem-cli
-CLI_IP=172.18.0.23
-CLI_PORT=8080
-SD="sudo docker"
-
+D="docker"
+TOTAL_STAEPS=8
 
 # cleaning
-echo Stopowanie
-$SD network rm $NETWORK_NAME
-$SD stop $SERV_DOCKER_NAME
-$SD stop $CLI_DOCKER_NAME
-$SD rm $SERV_DOCKER_NAME
-$SD rm $CLI_DOCKER_NAME
+STEP=1
+echo $STEP/$TOTAL_STAEPS Zatrzymywanie działających dockerów
+$D stop $SERV_DOCKER_NAME
+$D stop $CLI_DOCKER_NAME
+((STEP++))
 
-echo tworzenie sieci
+echo $STEP/$TOTAL_STAEPS Usuwanie konetenerów
+$D rm $SERV_DOCKER_NAME
+$D rm $CLI_DOCKER_NAME
+((STEP++))
+
+echo $STEP/$TOTAL_STAEPS Usuwanie sieci
+$D network rm $NETWORK_NAME
+((STEP++))
+
 set -e
-$SD network create --subnet=172.18.0.0/16 $NETWORK_NAME
+echo $STEP/$TOTAL_STAEPS Tworzenie sieci
+$D network create --subnet=172.18.0.0/16 $NETWORK_NAME
+((STEP++))
 
-# build server
-$SD build -t=$SERV_IMG_NAME docker/server/
+# build server and cli image
+echo $STEP/$TOTAL_STAEPS Tworzenie obrazu serwera
+$D build --no-cache -t=$SERV_IMG_NAME docker/server/
+((STEP++))
+echo $STEP/$TOTAL_STAEPS Tworzenie obrazu klienta
+$D build --no-cache -t=$CLI_IMG_NAME docker/client/
+((STEP++))
 
-# build cli
-$SD build -t=$CLI_IMG_NAME docker/client/
+#Tworzenie konetenerów
+$D create --net $NETWORK_NAME --ip $SERV_IP -it --name=$SERV_DOCKER_NAME $SERV_IMG_NAME
+$D create --net $NETWORK_NAME --ip $CLI_IP -it -p $CLI_PORT:$CLI_PORT  --name=$CLI_DOCKER_NAME $CLI_IMG_NAME
