@@ -8,7 +8,7 @@ var serverUrl = "http://172.18.0.22:42069";
 var usernameInput = document.getElementById("username");
 console.log(usernameInput);
 if(usernameInput != null){
-    usernameInput.addEventListener("keypress", function(){
+    usernameInput.addEventListener("keyup", function(){
         //send http request and check if it is valid username
         console.log(usernameInput.value);
 
