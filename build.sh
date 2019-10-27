@@ -27,12 +27,12 @@ $D network create --subnet=172.18.0.0/16 $NETWORK_NAME
 
 # build server and cli image
 echo $STEP/$TOTAL_STAEPS Tworzenie obrazu serwera
-$D build --no-cache -t=$SERV_IMG_NAME docker/server/
+$D build -t=$SERV_IMG_NAME docker/server/
 ((STEP++))
 echo $STEP/$TOTAL_STAEPS Tworzenie obrazu klienta
-$D build --no-cache -t=$CLI_IMG_NAME docker/client/
+$D build  -t=$CLI_IMG_NAME docker/client/
 ((STEP++))
 
 #Tworzenie konetenerów
-$D create --net $NETWORK_NAME --ip $SERV_IP -it --name=$SERV_DOCKER_NAME $SERV_IMG_NAME
+$D create --net $NETWORK_NAME --hostname server --ip $SERV_IP -it --name=$SERV_DOCKER_NAME $SERV_IMG_NAME
 $D create --net $NETWORK_NAME --ip $CLI_IP -it -p $CLI_PORT:$CLI_PORT  --name=$CLI_DOCKER_NAME $CLI_IMG_NAME

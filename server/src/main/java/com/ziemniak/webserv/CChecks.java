@@ -1,29 +1,32 @@
 package com.ziemniak.webserv;
 
 import com.ziemniak.webserv.redis.RedisAccess;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Allows to chceck if given nick is available and how strong password is
  */
-@Controller
+@RestController
+@CrossOrigin(origins = "*")
 public class CChecks {
 
 	@GetMapping("/check/username/{username}")
-	public ResponseEntity checkUsernameAvailability(@PathVariable(value = "username") String username){
-		ResponseEntity resonse = new ResponseEntity(HttpStatus.OK);
-		String body = null;
+	@CrossOrigin()
+	public ResponseEntity<UserNameCheck> checkUsernameAvailability(@PathVariable(value = "username") String username){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Access-Control-Allow-Origin", "*");
+
+		UserNameCheck resonse;
 		if(RedisAccess.exists(username)){
-			body = "{available: false, message: \"Username already exists\"}";
+			resonse = new UserNameCheck("Not avalible", false);
 		}else{
-			body = "{available: true, message: \"ok\"}";
+			resonse = new UserNameCheck("Avalible", true);
 		}
-		return new ResponseEntity(body, HttpStatus.OK);
+		return ResponseEntity.ok().header(String.valueOf(headers)).body(resonse);
 	}
 
 	@GetMapping("/check/password/{password}")

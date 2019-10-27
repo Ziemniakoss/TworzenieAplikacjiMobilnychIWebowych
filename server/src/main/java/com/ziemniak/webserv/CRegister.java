@@ -8,12 +8,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Controller responsible only for registering new users
  */
 @RestController
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
 public class CRegister {
 
 	/**
@@ -36,6 +37,7 @@ public class CRegister {
 	 * </ul>
 	 */
 	@PostMapping("/auth/register")
+	@CrossOrigin(origins = "*")
 	public ResponseEntity register(@RequestParam String username, @RequestParam String password, @RequestParam String validatePassword) {
 		int errorCode = 0;
 		System.out.println(username + " " + password);
