@@ -17,10 +17,18 @@
 		Register to BibloZiem
 	</h1>
 
-	<div th:if="${error != null}" class="error">
-		<h3 th:text="${error}"> Hek</h3>
+	<!--Errors TODO-->
+	<div class="error" th:if="${errorlist != null}">
+		<p th:each="eli : ${errorlist}" th:text="${eli}">aaa</p>
 	</div>
-	<form id="register" method="post">
+
+
+	<!--End of errors-->
+	<form id="register" method="post" th:object="${user}">
+		<div class="error" th:if="${#fields.hasErrors('*')}">
+			<p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
+		</div>
+
 		<table>
 			<tr>
 				<td>

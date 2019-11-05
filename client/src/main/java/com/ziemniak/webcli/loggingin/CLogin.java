@@ -1,4 +1,4 @@
-package com.ziemniak.webcli;
+package com.ziemniak.webcli.loggingin;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

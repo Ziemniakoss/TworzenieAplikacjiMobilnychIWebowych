@@ -1,9 +1,31 @@
-package com.ziemniak.webcli;
+package com.ziemniak.webcli.registering;
 
+import com.ziemiakoss.utils.validation.EqualFields;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+
+/**
+ * Request for registering new user in service
+ */
+//todo sprawdzanie czy hasła się zgadzają
+@EqualFields(first = "password", second = "validatePassword", message = "Passwords don't match")
 public class RegisterRequest {
+	@NotBlank(message = "Username is required")
+	@Size(min = 6, message = "Username must be between 6 and 20  character long")
+	//@Pattern(regexp = "", message = "") todo brak znaków specjalnych
 	private String username;
+
+	@NotBlank(message = "Password is required")
+	@Size(min = 7, message = "Password must be at least 7 characters long")
 	private String password;
+
+	@NotBlank(message = "Password validation is required")
 	private String validatePassword;
+
+	public RegisterRequest() {
+	}
 
 	public RegisterRequest(String username, String password, String validatePassword) {
 		this.username = username;
