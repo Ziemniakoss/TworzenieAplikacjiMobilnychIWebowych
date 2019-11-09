@@ -24,3 +24,9 @@ Aby zatrzymać i usunąć kontenery i ich obrazy należy uruchomić skrypt
 ```bash
 clean.sh
 ```
+
+## Swagger
+
+Backend aplikacji jest udokumentowany w Swaggerze i dokumentacja powinna być dostęna po uruchomieniu serwera jao
+- [Swagger gui](http://localhost:42069/swagger-ui.html)
+- [JSON](http://localhost:42069/v2/api-docs)
