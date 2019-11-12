@@ -1,0 +1,10 @@
+version: "3"
+services:
+  biblioziem-server:
+    build: "./server"
+    ports:
+      - "42069:42069"
+  biblioziem-client:
+    build: "./client"
+    ports:
+      - "8080:8080"

@@ -3,7 +3,7 @@
  * if given username is available and if two passwords given by user
  * are the same
  */
-var serverUrl = "http://172.18.0.22:42069";
+var serverUrl = "http://localhost:42069";
 // EventListener for username input changes
 var usernameInput = document.getElementById("username");
 console.log(usernameInput);

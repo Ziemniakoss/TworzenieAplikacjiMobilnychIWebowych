@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
  * Allows to chceck if given nick is available and how strong password is
  */
 @RestController
-@CrossOrigin(origins = "*")
 public class CheckingREST {
 
 	/**

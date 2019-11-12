@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ClientApplication {
-	public static  String URL_TO_SERVER="http://172.18.0.22:42069";
+	public static  String URL_TO_SERVER="http://biblioziem-server:42069";
 
 	public static void main(String[] args) {
 		if(args.length > 0) {
@@ -14,5 +14,4 @@ public class ClientApplication {
 		}
 		SpringApplication.run(ClientApplication.class, args);
 	}
-
 }

@@ -27,7 +27,7 @@ import java.util.Set;
  */
 @RestController
 @RequestMapping("/auth/register")
-@CrossOrigin(origins = "*")
+@CrossOrigin()
 @Api(value = "Hek")
 public class RegisterREST {
 	private final Logger log = LoggerFactory.getLogger(RegisterREST.class);
