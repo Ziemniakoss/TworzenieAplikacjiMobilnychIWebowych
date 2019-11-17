@@ -8,3 +8,7 @@ services:
     build: "./client"
     ports:
       - "8080:8080"
+  session-server:
+    build: "./session-server"
+    ports:
+      - "6379:6379"
