@@ -29,3 +29,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+docker/client/client-0.0.1-SNAPSHOT.jar
+docker/server/server-0.0.1-SNAPSHOT.jar
+*.rdb
