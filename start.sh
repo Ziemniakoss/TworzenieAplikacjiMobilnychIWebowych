@@ -1,7 +1,7 @@
 #!/bin/bash
 #budowanie
 FAIL=0
-./build.sh seraver &
+./build.sh server &
 ./build.sh client &
 for job in `jobs -p`
 do
