@@ -1,4 +1,4 @@
-package com.ziemiakoss.utils.validation;
+package com.ziemniak.webcli.utils;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

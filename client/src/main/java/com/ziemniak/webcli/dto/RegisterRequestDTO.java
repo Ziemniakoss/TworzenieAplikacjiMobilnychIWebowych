@@ -1,6 +1,6 @@
 package com.ziemniak.webcli.dto;
 
-import com.ziemiakoss.utils.validation.EqualFields;
+import com.ziemniak.webcli.utils.EqualFields;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;

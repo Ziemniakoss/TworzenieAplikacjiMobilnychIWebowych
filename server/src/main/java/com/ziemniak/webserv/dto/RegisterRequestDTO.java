@@ -1,6 +1,6 @@
 package com.ziemniak.webserv.dto;
 
-import com.ziemiakoss.utils.validation.EqualFields;
+import com.ziemniak.webserv.utils.EqualFields;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 

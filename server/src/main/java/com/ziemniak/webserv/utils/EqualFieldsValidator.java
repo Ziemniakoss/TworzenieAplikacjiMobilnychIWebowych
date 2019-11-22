@@ -1,6 +1,4 @@
-package com.ziemiakoss.utils.validation;
-
-import com.ziemiakoss.utils.validation.EqualFields;
+package com.ziemniak.webserv.utils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

@@ -1,12 +1,18 @@
 FROM ubuntu:16.04
 
-RUN apt-get update  && apt-get upgrade -y
+RUN apt-get update --fix-missing
+RUN apt-get upgrade -y
 RUN apt install redis-server -y
-RUN apt-get install openjdk-8-jre -y
+RUN apt-get install openjdk-8-jdk -y
 
+
+COPY .mvn .mvn
+COPY src src
+COPY pom.xml pom.xml
+COPY mvnw mvnw
 COPY docker-entrypoint.sh docker-entrypoint.sh
 RUN chmod 700 docker-entrypoint.sh
-COPY server-0.0.1-SNAPSHOT.jar server.jar
+RUN ./mvnw package
 
 EXPOSE 42069
 
