@@ -1,4 +1,4 @@
-package com.ziemniak.webserv.redis;
+package com.ziemniak.webserv;
 
 import java.io.Serializable;
 

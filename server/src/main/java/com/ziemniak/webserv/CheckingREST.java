@@ -1,11 +1,12 @@
 package com.ziemniak.webserv;
 
 import com.ziemniak.webserv.dto.UserNameCheckDTO;
-import com.ziemniak.webserv.redis.RedisAccess;
+import com.ziemniak.webserv.repositories.UserRepository;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class CheckingREST {
+	@Autowired
+	private UserRepository userRepository;
 
 	/**
 	 * Check if given username is available
@@ -36,7 +39,7 @@ public class CheckingREST {
 		headers.add("Access-Control-Allow-Origin", "*");
 
 		UserNameCheckDTO resonse;
-		if (RedisAccess.exists(username)) {
+		if (userRepository.exists(username)) {
 			resonse = new UserNameCheckDTO(username, false,"Not available");
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).header(String.valueOf(headers)).body(resonse);
 		} else {

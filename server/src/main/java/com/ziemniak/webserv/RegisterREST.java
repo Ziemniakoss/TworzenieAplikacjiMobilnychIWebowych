@@ -2,14 +2,13 @@ package com.ziemniak.webserv;
 
 import com.ziemniak.webserv.dto.RegisterRequestDTO;
 import com.ziemniak.webserv.dto.RegisterResponseDTO;
-import com.ziemniak.webserv.redis.RedisAccess;
-import com.ziemniak.webserv.redis.User;
+import com.ziemniak.webserv.repositories.UserRepository;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +30,8 @@ import java.util.Set;
 @Api(value = "Hek")
 public class RegisterREST {
 	private final Logger log = LoggerFactory.getLogger(RegisterREST.class);
+	@Autowired
+	private UserRepository userRepository;
 
 	@PostMapping(produces = "application/json", consumes = "application/json")
 	@CrossOrigin(origins = "*")
@@ -48,11 +49,11 @@ public class RegisterREST {
 		Validator validator = factory.getValidator();
 		Set<ConstraintViolation<RegisterRequestDTO>> violations = validator.validate(request);
 		if (violations.size() == 0) {
-			if (!RedisAccess.exists(request.getUsername())) {
+			if (!userRepository.exists(request.getUsername())) {
 				User u = new User();
 				u.setPassword(request.getPassword());
 				u.setUsername(request.getUsername());
-				RedisAccess.save(u);
+				userRepository.save(u);
 				log.info("Added new user with username \'" + u.getUsername() + "\'");
 				accepted = true;
 			} else {

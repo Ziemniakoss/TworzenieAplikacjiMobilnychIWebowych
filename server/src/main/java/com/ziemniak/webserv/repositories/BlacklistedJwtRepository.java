@@ -1,4 +1,4 @@
-package com.ziemniak.webserv.redis;
+package com.ziemniak.webserv.repositories;
 
 import org.springframework.stereotype.Repository;
 import redis.clients.jedis.Jedis;

@@ -1,11 +1,11 @@
-package com.ziemniak.sesserv;
+package com.ziemniak.tokenser;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SessionServerApp {
+public class tokenserver {
 	public static void main(String[] args) {
-		SpringApplication.run(SessionServerApp.class);
+		SpringApplication.run(tokenserver.class);
 	}
 }
