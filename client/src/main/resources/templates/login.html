@@ -8,13 +8,15 @@
 	<link href="../static/css/main.css" th:href="@{/css/main.css}" rel="stylesheet"/>
 </head>
 <body>
-<!--Logowanie-->
+<div th:insert="header">...</div>
 <main>
-	<form id="register" method="post" th:object="${user}">
+	<div class="error" th:if="${errorreason != null}">
+		<p th:text="${errorreason}">...</p>
+	</div>
+	<form id="login" method="post" th:object="${user}">
 <!--		<div class="error" th:if="${#fields.hasErrors('*')}">-->
 <!--			<p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>-->
 <!--		</div>-->
-
 		<table>
 			<tr>
 				<td>

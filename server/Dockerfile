@@ -18,6 +18,7 @@ RUN rm -rf src
 RUN rm -rf .mvn mvnw
 RUN rm pom.xml
 
+RUN mkdir webServerFiles
 COPY docker-entrypoint.sh docker-entrypoint.sh
 RUN chmod 700 docker-entrypoint.sh
 

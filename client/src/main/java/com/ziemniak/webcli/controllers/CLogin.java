@@ -24,6 +24,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
@@ -35,44 +37,28 @@ public class CLogin {
 	private final Logger log = LoggerFactory.getLogger(CLogin.class);
 
 	@GetMapping
-	public String get(Model model) {
+	public String get(Model model, HttpServletResponse response) {
+		response.addCookie(new Cookie("jwt", ""));
 		System.out.println(model.getAttribute("user"));
 		model.addAttribute("user", new LoginRequestDTO());
 		return "login";
 	}
 
 	@PostMapping
-	public String processLoginRequest(@Valid @ModelAttribute LoginRequestDTO loginReq, Errors errors, Model model) {
+	public String processLoginRequest(@Valid @ModelAttribute LoginRequestDTO loginReq, Errors errors, Model model, HttpServletResponse httpServletResponse) {
 		if (errors.hasErrors()) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("Login request had ");
-			sb.append(errors.getErrorCount());
-			sb.append(" errors: ");
-			boolean first = true;
-			for (ObjectError e : errors.getAllErrors()) {
-				if (first) {
-					sb.append(e.toString());
-					first = false;
-				} else {
-					sb.append(", ");
-					sb.append(e.toString());
-				}
-			}
-			log.warn(sb.toString());
+			processErrors(errors);
 			return "login";
 		}
 		try {
-			//Wysyłamy prośbe o JWT
-			String url = ClientApplication.URL_TO_SERVER + "/auth/login";
-			RestTemplate rt = new RestTemplate();
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			HttpEntity<LoginRequestDTO> e = new HttpEntity<>(loginReq, headers);
-			LoginPositiveResponseDto resp = rt.postForObject(url, e, LoginPositiveResponseDto.class);
-			System.err.println(resp.getJwt());
+			String jwt = getJwt(loginReq);
+			Cookie cookie = new Cookie("jwt", jwt);
+			cookie.setHttpOnly(true);
+			cookie.setMaxAge(5 * 60);
+			httpServletResponse.addCookie(cookie);
+			return "redirect:/home";
 		} catch (HttpClientErrorException e) {
-			//Złe dane logowania
-			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {//Złe dane logowania
 				LoginNegativeResponseDto resp;
 				try {
 					ObjectMapper mapper = new ObjectMapper();
@@ -95,17 +81,54 @@ public class CLogin {
 					"):" +
 					e.getMessage();
 			log.error(message);
-			model.addAttribute("errorreason","Server experienced error, please try again");
+			model.addAttribute("errorreason", "Server experienced error, please try again");
 			return "login";
 		} catch (Exception e) {
-			String message = "Unknown error occurred while logging to server"+
-					e.getClass()+
-					": "+
+			String message = "Unknown error occurred while logging to server" +
+					e.getClass() +
+					": " +
 					e.getMessage();
 			log.error(message);
 			model.addAttribute("errorreason", "Unknown error occurred, please try again later");
 			return "login";
 		}
-		return "redirect:/home";
+	}
+
+	/**
+	 * Pobiera z servera JWT dla podanych danych logowania
+	 * @param loginReq dane logowania
+	 * @return pobrany JWT
+	 * @throws HttpClientErrorException gdy dane logowania są niepoprawne
+	 * @throws HttpServerErrorException gdy server naotka problem przy przetwarzaniu żadania
+	 */
+	private String getJwt(LoginRequestDTO loginReq) throws HttpClientErrorException, HttpServerErrorException {
+		log.info("Trying to get jwt for user \"" + loginReq.getUsername() + "\"");
+		String url = ClientApplication.URL_TO_SERVER + "/auth/login";
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<LoginRequestDTO> e = new HttpEntity<>(loginReq, headers);
+		LoginPositiveResponseDto resp = rt.postForObject(url, e, LoginPositiveResponseDto.class);
+		String jwt = resp.getJwt();
+		log.info("Recived jwt for user \"" + loginReq.getUsername() + "\"");
+		return jwt;
+	}
+
+	private void processErrors(Errors errors) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Login request had ");
+		sb.append(errors.getErrorCount());
+		sb.append(" errors: ");
+		boolean first = true;
+		for (ObjectError e : errors.getAllErrors()) {
+			if (first) {
+				sb.append(e.toString());
+				first = false;
+			} else {
+				sb.append(", ");
+				sb.append(e.toString());
+			}
+		}
+		log.warn(sb.toString());
 	}
 }

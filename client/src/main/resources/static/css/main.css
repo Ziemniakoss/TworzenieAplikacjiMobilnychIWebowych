@@ -20,3 +20,20 @@ header{
     padding: 5px 5px;
     margin: 5px 5px;
 }
+.contact{
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.file-table{
+	margin-left: auto;
+	margin-right: auto;
+	width: 70%;
+}
+
+footer{
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	background: blue;
+}
