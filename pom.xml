@@ -4,10 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
-		<module>utlis</module>
 		<module>client</module>
 		<module>server</module>
-		<module>sessionserver</module>
+		<module>tokenserver</module>
 	</modules>
     <parent>
 		<groupId>org.springframework.boot</groupId>
