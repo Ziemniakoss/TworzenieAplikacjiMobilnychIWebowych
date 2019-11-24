@@ -1,7 +1,8 @@
-package com.ziemniak.webcli;
+package com.ziemniak.webcli.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ziemniak.webcli.ClientApplication;
 import com.ziemniak.webcli.dto.RegisterRequestDTO;
 import com.ziemniak.webcli.dto.RegisterResponseDTO;
 import org.slf4j.Logger;

@@ -6,7 +6,6 @@
     <modules>
 		<module>client</module>
 		<module>server</module>
-		<module>tokenserver</module>
 	</modules>
     <parent>
 		<groupId>org.springframework.boot</groupId>
@@ -56,7 +55,6 @@
 			<version>2.9.0</version>
 			<type>jar</type>
 		</dependency>
-
 	</dependencies>
 
 	<build>
