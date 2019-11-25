@@ -21,6 +21,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -36,11 +37,11 @@ public class FileAccessREST {
 
 	private final Logger log = LoggerFactory.getLogger(FileAccessREST.class);
 
-	@PostMapping(value = "/files/add",produces = "application/json")
+	@PostMapping(value = "/files/add", produces = "application/json")
 	@ApiOperation(value = "Creates new file in database")
 	@ApiResponses({
-			@ApiResponse(code = 200, message = "User was authorized and file was created successfully",response = FileUploadPositiveResponseDTO.class),
-			@ApiResponse(code = 401, message = "User used invalid or expired JWT",response = String.class)
+			@ApiResponse(code = 200, message = "User was authorized and file was created successfully", response = FileUploadPositiveResponseDTO.class),
+			@ApiResponse(code = 401, message = "User used invalid or expired JWT", response = String.class)
 	})
 	public ResponseEntity add(@CookieValue(value = "jwt", defaultValue = "") String jwt, @RequestParam("file") MultipartFile file) {
 
@@ -87,18 +88,20 @@ public class FileAccessREST {
 		}
 	}
 
-	@GetMapping(value = "/files/getall", produces = "application/json", consumes = "application/json")
+	@GetMapping(value = "/files/getall", consumes = "application/json",produces = "application/json")
 	@ApiOperation(value = "Get info about all  uploaded by user", consumes = "application/json", produces = "application/json")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "User was authorized and server returned all user's files info"),
 			@ApiResponse(code = 401, message = "jwt cookie contained invalid JWT")
 	})
-	private ResponseEntity getAll(@CookieValue(value = "jwt", defaultValue = "") String jwt) {
+	private ResponseEntity getAll(@CookieValue(value = "jwt", defaultValue = "") String jwt, HttpServletRequest httpServletRequest) {
 		if (!tokenManager.verify(jwt)) {
+			log.warn("Someone used invalid JWT(" + jwt + ")");
 			return new ResponseEntity<>("JWT is not valid", HttpStatus.UNAUTHORIZED);
 		}
 		String username = tokenManager.getUsername(jwt);
 		List<File> files = fileInfoRepository.getAllFiles(username);
+		log.info("Returning fileList("+files.size()+" items)");
 		return new ResponseEntity<>(files, HttpStatus.OK);
 	}
 }
