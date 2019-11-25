@@ -1,13 +1,13 @@
 package com.ziemniak.webserv;
 
-import com.ziemniak.webserv.dto.LoginNegativeResponseDto;
-import com.ziemniak.webserv.dto.LoginPositiveResponseDto;
-import com.ziemniak.webserv.dto.LoginRequestDto;
+import com.ziemniak.webserv.dto.*;
 import com.ziemniak.webserv.repositories.BlacklistedJwtRepository;
 import com.ziemniak.webserv.repositories.UserRepository;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +22,7 @@ import java.util.Date;
  * Pozwala na wytwarzanie JWT
  */
 public class JwtRest {
+	private final Logger log = LoggerFactory.getLogger(JwtRest.class);
 	private static final int JWT_DURABILITY = 5 * 1000 * 60;//5min
 	@Autowired
 	private BlacklistedJwtRepository blackList;
@@ -30,7 +31,7 @@ public class JwtRest {
 	@Autowired
 	private TokenManager tokenManager;
 
-	@PostMapping(value = "/auth/login", produces = "application/json",consumes = "application/json")
+	@PostMapping(value = "/auth/login", produces = "application/json", consumes = "application/json")
 	@ApiOperation(value = "Login with username and password and receive jwt ")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Login was successful", response = LoginPositiveResponseDto.class),
@@ -50,11 +51,12 @@ public class JwtRest {
 		return new ResponseEntity<>(new LoginNegativeResponseDto("User does not exists"), HttpStatus.UNAUTHORIZED);
 	}
 
-	@PostMapping(value = "/auth/logout",produces = "application/json",consumes = "application/json")
-	public String blacklistJwt(String jwt) {
-		if (tokenManager.verify(jwt)) {
-			blackList.add(jwt);
+	@PostMapping(value = "/auth/logout", produces = "application/json", consumes = "application/json")
+	public ResponseEntity blacklistJwt(@RequestBody BlacklistJwtRequestDTO req) {
+		if (tokenManager.verify(req.getJwt())) {
+			blackList.add(req.getJwt());
 		}
-		return null;
+		log.info("JWT was blacklisted(" + req.getJwt() + ")");
+		return new ResponseEntity<>(new BlacklistJwtResponseDTO(req.getJwt(), true), HttpStatus.OK);
 	}
 }

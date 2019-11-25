@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.*;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ziemniak.webserv.repositories.BlacklistedJwtRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class TokenManager {
 	private final Logger log = LoggerFactory.getLogger(TokenManager.class);
-	String secret = "hadghhghalgsalahahf";
+	private String secret = "sekrecik";//Todo ukyć go
 
 	@Autowired
 	private BlacklistedJwtRepository blackList;
@@ -75,11 +78,18 @@ public class TokenManager {
 		return "";
 	}
 
-	public boolean isBlacklisted(String jwt){
+	public String getUsername(String jwt) {
+		DecodedJWT decodedJWT = JWT.decode(jwt);
+		Map<String, Claim> claims = decodedJWT.getClaims();
+		Claim username = claims.get("u");
+		return username.asString();
+	}
+
+	public boolean isBlacklisted(String jwt) {
 		return blackList.isBlacklisted(jwt);
 	}
 
-	public void addToBlacklist(String jwt){
+	public void addToBlacklist(String jwt) {
 		blackList.add(jwt);
 	}
 

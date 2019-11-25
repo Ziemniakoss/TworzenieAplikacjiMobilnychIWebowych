@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
- * Controller allowing to lo into system
+ * Kontroler odpowiedzialny za logowanie do systemu
  */
 @Controller
 @RequestMapping("/login")
@@ -39,7 +39,6 @@ public class CLogin {
 	@GetMapping
 	public String get(Model model, HttpServletResponse response) {
 		response.addCookie(new Cookie("jwt", ""));
-		System.out.println(model.getAttribute("user"));
 		model.addAttribute("user", new LoginRequestDTO());
 		return "login";
 	}
@@ -96,6 +95,7 @@ public class CLogin {
 
 	/**
 	 * Pobiera z servera JWT dla podanych danych logowania
+	 *
 	 * @param loginReq dane logowania
 	 * @return pobrany JWT
 	 * @throws HttpClientErrorException gdy dane logowania są niepoprawne

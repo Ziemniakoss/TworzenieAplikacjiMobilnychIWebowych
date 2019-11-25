@@ -8,9 +8,9 @@
 <body>
 <div th:insert="header">...</div>
 <main>
-	<h2>Welcome to BiblioZiem</h2>
-
-
+	<form method="post" action="/logout">
+		<input type="submit" value="Wyloguj">
+	</form>
 	<!--Dodawanie nowego pliku-->
 	<form method="post" enctype="multipart/form-data" action="/home">
 		<table>

@@ -2,6 +2,7 @@ package com.ziemniak.webserv;
 
 import com.ziemniak.webserv.dto.RegisterRequestDTO;
 import com.ziemniak.webserv.dto.RegisterResponseDTO;
+import com.ziemniak.webserv.filestorage.StorageService;
 import com.ziemniak.webserv.repositories.UserRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiResponse;
@@ -27,11 +28,13 @@ import java.util.Set;
 @RestController
 @RequestMapping("/auth/register")
 @CrossOrigin()
-@Api(value = "Hek")
+@Api(value = "Allows to create new user in database")
 public class RegisterREST {
 	private final Logger log = LoggerFactory.getLogger(RegisterREST.class);
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private StorageService storageService;
 
 	@PostMapping(produces = "application/json", consumes = "application/json")
 	@CrossOrigin(origins = "*")
@@ -56,6 +59,7 @@ public class RegisterREST {
 				userRepository.save(u);
 				log.info("Added new user with username \'" + u.getUsername() + "\'");
 				accepted = true;
+				storageService.addUser(u.getUsername());
 			} else {
 				errors.add("User with username \'" + request.getUsername() + "\' already exists");
 			}

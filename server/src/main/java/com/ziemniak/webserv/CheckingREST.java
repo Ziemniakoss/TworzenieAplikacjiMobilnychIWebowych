@@ -2,10 +2,7 @@ package com.ziemniak.webserv;
 
 import com.ziemniak.webserv.dto.UserNameCheckDTO;
 import com.ziemniak.webserv.repositories.UserRepository;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Allows to chceck if given nick is available and how strong password is
  */
 @RestController
+@Api(description = "Checks if username is available or if password is strong enough")
 public class CheckingREST {
 	@Autowired
 	private UserRepository userRepository;
