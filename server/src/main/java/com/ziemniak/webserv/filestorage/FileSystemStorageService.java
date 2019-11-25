@@ -48,6 +48,7 @@ public class FileSystemStorageService implements StorageService {
 			throw new StorageException();
 		}
 		try {
+			new File(getPath(username)).mkdirs();
 			InputStream inputStream = file.getInputStream();
 			fileInfoRepository.storeFile(username, f);
 			Path path = Paths.get(getPath(username, f.getId()));

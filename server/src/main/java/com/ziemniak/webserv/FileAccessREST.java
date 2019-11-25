@@ -36,7 +36,7 @@ public class FileAccessREST {
 
 	private final Logger log = LoggerFactory.getLogger(FileAccessREST.class);
 
-	@PostMapping(value = "/files/add")
+	@PostMapping(value = "/files/add",produces = "application/json")
 	@ApiOperation(value = "Creates new file in database")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "User was authorized and file was created successfully",response = FileUploadPositiveResponseDTO.class),
