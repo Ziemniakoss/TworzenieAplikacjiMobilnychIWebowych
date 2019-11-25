@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.NotBlank;
 
 @ApiModel(description = "Request to login and generate JWT", value = "LoginRequest")
-public class LoginRequestDto {
+public class LoginRequestDTO {
 	@NotBlank
 	@ApiModelProperty(notes = "Username")
 	private String username;

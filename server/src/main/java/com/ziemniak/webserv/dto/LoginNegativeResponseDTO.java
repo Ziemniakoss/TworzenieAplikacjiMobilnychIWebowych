@@ -4,14 +4,14 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "Negative response for login request", value = "NegativeLoginResponse")
-public class LoginNegativeResponseDto {
+public class LoginNegativeResponseDTO {
 	@ApiModelProperty(notes = "Why was response rejected(bad login or password)")
 	private String reason;
 
-	public LoginNegativeResponseDto() {
+	public LoginNegativeResponseDTO() {
 	}
 
-	public LoginNegativeResponseDto(String reason) {
+	public LoginNegativeResponseDTO(String reason) {
 		this.reason = reason;
 	}
 

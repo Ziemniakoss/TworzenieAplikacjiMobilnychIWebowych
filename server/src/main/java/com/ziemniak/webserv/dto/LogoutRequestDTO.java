@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "Request to blacklist JWT", value = "LogoutRequest")
-public class LogoutRequestDto {
+public class LogoutRequestDTO {
 	@ApiModelProperty(notes = "JWT to blacklist")
 	private String jwt;
 

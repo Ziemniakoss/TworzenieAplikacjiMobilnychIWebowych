@@ -5,6 +5,7 @@ import com.ziemniak.webserv.dto.RegisterResponseDTO;
 import com.ziemniak.webserv.filestorage.StorageService;
 import com.ziemniak.webserv.repositories.UserRepository;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/auth/register")
 @CrossOrigin()
-@Api(value = "Allows to create new user in database")
+@Api(description = "Allows to create new user in database")
 public class RegisterREST {
 	private final Logger log = LoggerFactory.getLogger(RegisterREST.class);
 	@Autowired
@@ -45,6 +46,7 @@ public class RegisterREST {
 							"not matching passwords or the fact that user with given username already exists in database",
 					response = RegisterResponseDTO.class)
 	})
+	@ApiOperation(value = "Create new user in database", produces = "application/json", consumes = "application/json")
 	public ResponseEntity register(@RequestBody RegisterRequestDTO request) {
 		boolean accepted = false;
 		List<String> errors = new ArrayList<>();

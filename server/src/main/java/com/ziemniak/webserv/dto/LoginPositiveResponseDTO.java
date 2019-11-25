@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "Positive response to login request", value = "PositiveLoginResponse")
-public class LoginPositiveResponseDto {
+public class LoginPositiveResponseDTO {
 	@ApiModelProperty(notes = "JWT generated based on given login data")
 	private String jwt;
 
