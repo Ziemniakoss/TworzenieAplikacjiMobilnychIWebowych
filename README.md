@@ -21,7 +21,7 @@ Backend aplikacji jest udokumentowany w Swaggerze i dokumentacja powinna być do
 
 Dokumentacja jest też dostępna na [github pages](https://ziemniakoss.github.io/TworzenieAplikacjiMobilnychIWebowych/)
 
-##Jak sprawdzić czy js sie wykonuje asynchronicznie
+## Jak sprawdzić czy js sie wykonuje asynchronicznie
 
 Podczas wpisywania nazwy użytkownika przy rejstracji aplikacja będzie na przy każdym wciśnięciu klawisza w polu użytkownik wysyłała
 zapytanie do serwera w celu sprawdzenia czy dana nazwa użytkownika jest dostępna:
