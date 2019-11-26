@@ -1,8 +1,8 @@
 package com.ziemniak.webcli.controllers;
 
 import com.ziemniak.webcli.ClientApplication;
+import com.ziemniak.webcli.File;
 import com.ziemniak.webcli.dto.FileUploadPositiveResponseDTO;
-import com.ziemniak.webcli.dto.GetAllFilesResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -12,18 +12,18 @@ import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/home")
@@ -36,22 +36,18 @@ public class CHome {
 			return "redirect:/login";
 		}
 		//pobranie listy publikacji
-//		RestTemplate rt = new RestTemplate();
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.set("Cookie", "jwt=" + jwt);
-//		headers.setContentType(MediaType.APPLICATION_JSON);
-//		HttpEntity entity = new HttpEntity("", headers);
-//		Map<String, String > uriVariables = new HashMap<>();
-//		uriVariables.put("jwt", jwt);
-//
-//		String url = ClientApplication.URL_TO_SERVER + "/files/getall";
-//		System.out.println(jwt);
-//
-//		ResponseEntity<GetAllFilesResponseDTO> response = rt.exchange(url, HttpMethod.GET, entity, GetAllFilesResponseDTO.class,new HashMap<>());
-//		List<com.ziemniak.webcli.File> files = response.getBody().getFiles();
-//		log.info("Got fileList");
-//		System.out.println(files);
-//		model.addAttribute("files", files);
+		try {
+			File[] files = fetchFileList(jwt);
+			model.addAttribute("fileList",files);
+		} catch (HttpClientErrorException e) {
+			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+				log.warn("Error while fetching files due to expired or invalid JWT");
+				return "redirect:/login";
+			}
+		} catch (HttpServerErrorException e) {
+			log.error("Server experienced error while processing file list get request");
+			return "redirect:/error";
+		}
 		return "home";
 	}
 
@@ -65,7 +61,7 @@ public class CHome {
 			model.addAttribute("errorreason", "File was empty");
 			return "redirect:/home";
 		}
-		Path pathToTemp = save(file);
+		Path pathToTemp = saveTemp(file);
 		FileSystemResource resource = new FileSystemResource(pathToTemp) {
 			@Override
 			public String getFilename() {
@@ -80,21 +76,36 @@ public class CHome {
 
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 		body.add("file", resource);
-		body.add("filename", "test");
-		body.add("name", "test");
-		System.out.println(body.get("file").isEmpty());
+		body.add("fileName", file.getOriginalFilename());
 		HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(body, headers);
 		String url = ClientApplication.URL_TO_SERVER + "/files/add";
 		RestTemplate restTemplate = new RestTemplate();
 		try {
 			restTemplate.postForObject(url, httpEntity, FileUploadPositiveResponseDTO.class);
-			log.info("Dont u worry it works xd");
+			log.info("Successfully send file");
+		} catch (HttpStatusCodeException e) {
+			switch (e.getStatusCode()) {
+				case BAD_REQUEST:
+					log.error("Bad request received while trying to send file to server: " + e.getMessage());
+					new java.io.File(pathToTemp.toUri()).delete();
+					log.info("Deleted temporary file " + pathToTemp.getFileName());
+					return "redirect:/error";
+				case UNAUTHORIZED:
+					new java.io.File(pathToTemp.toUri()).delete();
+					log.info("Deleted temporary file " + pathToTemp.getFileName());
+					return "redirect:/login";
+				default:
+					log.error("Unknown error occured with code " + e.getStatusCode() + ':' + e.getMessage());
+					new java.io.File(pathToTemp.toUri()).delete();
+					log.info("Deleted temporary file " + pathToTemp.getFileName());
+
+					return "redirect:/error";
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		new File(pathToTemp.toUri()).delete();
+		new java.io.File(pathToTemp.toUri()).delete();
 		log.info("Deleted temporary file " + pathToTemp.getFileName());
-
 		return "redirect:/home";
 	}
 
@@ -104,20 +115,19 @@ public class CHome {
 	 * @param file plik do zapisania
 	 * @return ścieżka do pliku
 	 */
-	private Path save(MultipartFile file) {
-		new File("temp").mkdir();
-		//Szukamy wolnej ścieżki
-		log.info("Findint teporary path for file");
-		File f = null;
+	private Path saveTemp(MultipartFile file) {
+		new java.io.File("temp").mkdir();
+		java.io.File f = null;
 		int i = 1;
-//		while (true) {
-//			f = new File("temp" + File.separator + i);
-//			if (!f.exists()) {
-//				break;
-//			}
-//		}
-		f = new File("temp/" + file.getName());
-		log.info("Saving " + file.getName() + " temporarily on disc as temp/" + i);
+		while (true){
+			f= new java.io.File("temp"+ java.io.File.separator+i);
+			if(f.exists()){
+				i+=1;
+			}else{
+				break;
+			}
+		}
+		log.info("Saving " + file.getName() + " temporarily on disc as " + f.toPath());
 		try {
 			InputStream inputStream = file.getInputStream();
 			Files.copy(inputStream, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -125,5 +135,25 @@ public class CHome {
 			e.printStackTrace();
 		}
 		return f.toPath();
+	}
+
+	/**
+	 * Pobiera listę plików z serwera
+	 *
+	 * @param jwt JWT utożsamiający użytkownika
+	 * @return lista plików należących do posiadacza tokenu
+	 * @throws HttpServerErrorException kiedy server napotka problem przy przetwarzaniu zapytania
+	 * @throws HttpClientErrorException kiedy token autoryzujący użytkownika jest niepoprawny
+	 *                                  lub nieaktualny
+	 */
+	private File[] fetchFileList(String jwt) throws HttpClientErrorException, HttpServerErrorException {
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Cookie", "jwt=" + jwt);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity entity = new HttpEntity<>("", headers);
+		String url = ClientApplication.URL_TO_SERVER + "/files/getall";
+		ResponseEntity<File[]> response = rt.exchange(url, HttpMethod.GET, entity, com.ziemniak.webcli.File[].class, new HashMap<>());
+		return response.getBody();
 	}
 }

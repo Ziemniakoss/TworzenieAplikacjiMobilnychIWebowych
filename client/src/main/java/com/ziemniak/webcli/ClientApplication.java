@@ -10,7 +10,6 @@ public class ClientApplication {
 	public static void main(String[] args) {
 		if(args.length > 0) {
 			URL_TO_SERVER = args[0];
-			System.out.println(URL_TO_SERVER);
 		}
 		SpringApplication.run(ClientApplication.class, args);
 	}

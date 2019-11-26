@@ -43,8 +43,8 @@ public class FileAccessREST {
 			@ApiResponse(code = 200, message = "User was authorized and file was created successfully", response = FileUploadPositiveResponseDTO.class),
 			@ApiResponse(code = 401, message = "User used invalid or expired JWT", response = String.class)
 	})
-	public ResponseEntity add(@CookieValue(value = "jwt", defaultValue = "") String jwt, @RequestParam("file") MultipartFile file) {
-
+	public ResponseEntity add(@CookieValue(value = "jwt", defaultValue = "") String jwt, @RequestParam("file") MultipartFile file, @RequestParam("fileName") String filename) {
+		System.err.println(file.getOriginalFilename());
 		if (!tokenManager.verify(jwt)) {
 			log.warn("Someone tried to add file without valid JWT");
 			return new ResponseEntity<>("JWT is not valid", HttpStatus.UNAUTHORIZED);
@@ -52,7 +52,7 @@ public class FileAccessREST {
 		String username = tokenManager.getUsername(jwt);
 		log.info('"' + username + "\" is adding file " + file.getName());
 		try {
-			storage.store(username, file);
+			storage.store(username, file,filename);
 			log.info(username + " added  file " + file.getName());
 			return new ResponseEntity<>(new FileUploadPositiveResponseDTO(file.getName()), HttpStatus.OK);
 		} catch (StorageException e) {
@@ -66,7 +66,7 @@ public class FileAccessREST {
 	@ApiOperation(value = "Get file with specified id", produces = "application/json", consumes = "application/json")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "User was authorized and resource was found and returned"),
-			@ApiResponse(code = 400, message = "User request had errors", response = FileNegativeResponseDto.class),
+			@ApiResponse(code = 400, message = "User request had errors"),
 			@ApiResponse(code = 401, message = "User used invalid(or expired) JWT", response = FileNegativeResponseDto.class)
 	})
 	public ResponseEntity getFile(@CookieValue(value = "jwt", defaultValue = "") String jwt, @Valid @RequestBody FileRequestDTO req, Errors errors) {

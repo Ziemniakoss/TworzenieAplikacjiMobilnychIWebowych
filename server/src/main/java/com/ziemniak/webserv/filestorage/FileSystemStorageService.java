@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 
 @Service
 public class FileSystemStorageService implements StorageService {
@@ -35,9 +36,9 @@ public class FileSystemStorageService implements StorageService {
 	}
 
 	@Override
-	public void store(String username, MultipartFile file) throws StorageException {
+	public void store(String username, MultipartFile file, String fileName) throws StorageException {
 		com.ziemniak.webserv.filestorage.File f = new com.ziemniak.webserv.filestorage.File();
-		f.setName(file.getName());
+		f.setName(fileName);
 		if (file.isEmpty()) {
 			log.warn("\"" + username + "\" tried to save empty file");
 			throw new EmptyFile();
@@ -49,6 +50,7 @@ public class FileSystemStorageService implements StorageService {
 		}
 		try {
 			new File(getPath(username)).mkdirs();
+			f.setCreationDate(LocalDateTime.now());
 			InputStream inputStream = file.getInputStream();
 			fileInfoRepository.storeFile(username, f);
 			Path path = Paths.get(getPath(username, f.getId()));

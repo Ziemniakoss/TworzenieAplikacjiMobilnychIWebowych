@@ -3,11 +3,29 @@ package com.ziemniak.webserv.filestorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
+
 public class File {
 	private static final Logger log = LoggerFactory.getLogger(File.class);
 	private String name;
 	private String id;
 	private String extension;
+	private String creationDate;
+
+	public String getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(String creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public void setCreationDate(LocalDateTime date) {
+		//dd.m.yyyy h:m
+		String formatted = String.format("%d.%d.%d %d:%d", date.getDayOfMonth(), date.getMonth().getValue(), date.getYear(),
+				date.getHour(), date.getMinute());
+		creationDate = formatted;
+	}
 
 
 	public File() {
@@ -50,7 +68,6 @@ public class File {
 	}
 
 	private static String getExtensionName(String extension) {
-		System.out.println(extension);
 		switch (extension) {
 			case "pdf":
 				return "PDF document";

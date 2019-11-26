@@ -27,6 +27,7 @@ public class FileInfoRepository {
 		File f = new File();
 		f.setName(fileParams.get("name"));
 		f.setId(fileParams.get("id"));
+		f.setCreationDate(fileParams.get("creationDate"));
 		j.close();
 		return f;
 	}
@@ -44,6 +45,7 @@ public class FileInfoRepository {
 		String key = getKey(username, id);
 		j.hset(key, "id", id);
 		j.hset(key, "name", f.getName());
+		j.hset(key,"creationDate",f.getCreationDate());
 		j.close();
 		f.setId(id);
 		return f;
@@ -60,6 +62,7 @@ public class FileInfoRepository {
 			if (!fileParams.isEmpty()) {
 				f.setId(fileParams.get("id"));
 				f.setName(fileParams.get("name"));
+				f.setCreationDate(fileParams.get("creationDate"));
 			}
 			files.add(f);
 		}

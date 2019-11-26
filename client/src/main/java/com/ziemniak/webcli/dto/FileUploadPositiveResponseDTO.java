@@ -7,6 +7,9 @@ public class FileUploadPositiveResponseDTO {
 		return fileName;
 	}
 
+	public FileUploadPositiveResponseDTO() {
+	}
+
 	public FileUploadPositiveResponseDTO(String fileName) {
 		this.fileName = fileName;
 	}

@@ -8,7 +8,16 @@ public class File {
 	private String name;
 	private String id;
 	private String extension;
+	private String creationDate;
 
+
+	public String getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(String creationDate) {
+		this.creationDate = creationDate;
+	}
 
 	public File() {
 	}
@@ -50,7 +59,6 @@ public class File {
 	}
 
 	private static String getExtensionName(String extension) {
-		System.out.println(extension);
 		switch (extension) {
 			case "pdf":
 				return "PDF document";
@@ -66,7 +74,7 @@ public class File {
 				return "OpenDocument";
 			default:
 				log.warn("Unknown extension of file: " + extension);
-				return "Unknown extension";
+				return extension + " file";
 		}
 	}
 

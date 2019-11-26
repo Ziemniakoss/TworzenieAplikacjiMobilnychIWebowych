@@ -7,7 +7,7 @@ public interface StorageService {
 
 	void addUser(String user);
 
-	void store(String username, MultipartFile file) throws StorageException;
+	void store(String username, MultipartFile file, String filename) throws StorageException;
 
 	/**
 	 * Usuwa plik z bazy plików

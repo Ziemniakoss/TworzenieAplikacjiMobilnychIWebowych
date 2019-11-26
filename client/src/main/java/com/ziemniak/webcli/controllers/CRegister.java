@@ -69,8 +69,6 @@ public class CRegister {
 				}
 			}
 		}catch (Exception e){
-			System.out.println("Nosz ja nie moge");
-			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 		return "register";
