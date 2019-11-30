@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="pl" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="UTF-8">
 	<title>Welcome</title>
@@ -31,13 +31,13 @@
 	<table th:if="${fileList != null}" class="file-table">
 		<tbody>
 		<tr th:each="file : ${fileList}">
-
-			<td th:text="${file.id}"></td>
 			<td th:text="${file.name}"></td>
 			<td th:text="${file.creationDate}"></td>
 			<td th:text="${file.extension}"></td>
 			<td>
-				<!--TODO przycisk do pobierania-->
+				<form th:action="@{'/home/fetchfile/' + ${file.id}}">
+					<input type="submit" value="Pobierz">
+				</form>
 			</td>
 		</tr>
 		</tbody>

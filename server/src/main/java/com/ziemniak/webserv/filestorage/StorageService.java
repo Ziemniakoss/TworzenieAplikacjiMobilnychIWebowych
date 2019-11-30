@@ -1,7 +1,9 @@
 package com.ziemniak.webserv.filestorage;
 
-import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
 
 public interface StorageService {
 
@@ -24,5 +26,5 @@ public interface StorageService {
 	 * @param fileId
 	 * @return
 	 */
-	Resource get(String username, String fileId) throws StorageException;
+	File get(String username, String fileId) throws StorageException, IOException;
 }

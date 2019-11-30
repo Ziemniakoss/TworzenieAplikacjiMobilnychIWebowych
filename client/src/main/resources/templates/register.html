@@ -10,7 +10,7 @@
 <main>
 
 	<h1>
-		Register to BibloZiem
+		Zarejstruj się do BibloZiem
 	</h1>
 
 	<div class="error" th:if="${errorlist != null}">
@@ -28,7 +28,7 @@
 			<tr>
 				<td>
 					<label for="username">
-						Username
+						Nazwa użykownika
 					</label>
 				</td>
 				<td>
@@ -38,7 +38,7 @@
 			<tr>
 				<td>
 					<label for="password">
-						Password
+						Hasło
 					</label>
 				</td>
 				<td>
@@ -48,7 +48,7 @@
 			<tr>
 				<td>
 					<label for="validatePassword">
-						Validate password
+						Potwierdź hasło
 					</label>
 				</td>
 				<td>
@@ -57,12 +57,7 @@
 			</tr>
 			<tr>
 				<td colspan="3">
-					<input type="submit" value="Submit">
-					<!--
-					<button type="submit" title="Submit" form="register">
-						Zarejstruj
-					</button>
-					-->
+					<input type="submit" value="Zarejstruj">
 				</td>
 			</tr>
 		</table>
@@ -72,7 +67,7 @@
 
 </main>
 <footer>
-
+	<div th:insert="footer">foot</div>
 </footer>
 </body>
 </html>

@@ -1,9 +1,8 @@
 package com.ziemniak.webserv;
 
-import com.ziemniak.webserv.dto.FileNegativeResponseDto;
-import com.ziemniak.webserv.dto.FileRequestDTO;
 import com.ziemniak.webserv.dto.FileUploadPositiveResponseDTO;
 import com.ziemniak.webserv.filestorage.File;
+import com.ziemniak.webserv.filestorage.FileDoesNotExist;
 import com.ziemniak.webserv.filestorage.StorageException;
 import com.ziemniak.webserv.filestorage.StorageService;
 import com.ziemniak.webserv.repositories.FileInfoRepository;
@@ -14,15 +13,18 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -52,7 +54,7 @@ public class FileAccessREST {
 		String username = tokenManager.getUsername(jwt);
 		log.info('"' + username + "\" is adding file " + file.getName());
 		try {
-			storage.store(username, file,filename);
+			storage.store(username, file, filename);
 			log.info(username + " added  file " + file.getName());
 			return new ResponseEntity<>(new FileUploadPositiveResponseDTO(file.getName()), HttpStatus.OK);
 		} catch (StorageException e) {
@@ -62,33 +64,39 @@ public class FileAccessREST {
 		return null;//todo
 	}
 
-	@GetMapping(value = "/files/get", consumes = "application/json", produces = "application/json")
-	@ApiOperation(value = "Get file with specified id", produces = "application/json", consumes = "application/json")
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "User was authorized and resource was found and returned"),
-			@ApiResponse(code = 400, message = "User request had errors"),
-			@ApiResponse(code = 401, message = "User used invalid(or expired) JWT", response = FileNegativeResponseDto.class)
-	})
-	public ResponseEntity getFile(@CookieValue(value = "jwt", defaultValue = "") String jwt, @Valid @RequestBody FileRequestDTO req, Errors errors) {
-		if (errors.hasErrors()) {
-			log.error("Request for single file had " + errors.getErrorCount() + " errors: " + errors.getAllErrors());
-			return new ResponseEntity<>(new FileNegativeResponseDto(errors.getAllErrors().toString()), HttpStatus.BAD_REQUEST);
-		}
+	@GetMapping(value = "/files/get/{id}", produces = "multipart/mixed")
+	public ResponseEntity getFile(HttpServletResponse response, @PathVariable String id, @CookieValue(value = "jwt", defaultValue = "") String jwt) {
 		if (!tokenManager.verify(jwt)) {
-			return new ResponseEntity<>(new FileNegativeResponseDto("Invalid JWT"), HttpStatus.UNAUTHORIZED);
+			log.warn("Someone tried to download file without valid JWT(" + jwt + ')');
+			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
 		String username = tokenManager.getUsername(jwt);
-
 		try {
-			Resource resource = storage.get(username, "" + req.getId());
-			return new ResponseEntity<>(resource, HttpStatus.OK);
+			File f = fileInfoRepository.getFile(username, id);
+			response.setHeader("Content-disposition", "attachment; filename=" + f.getName());
+			OutputStream out = response.getOutputStream();
+			Path path = Paths.get(storage.get(username, id).toURI());
+			log.info("Sending file " + path.toUri());
+			Files.copy(path, out);
+			out.close();
+
+
+			//usuwam plik tymczasowy
+			log.info("Deleting temporarty file: " + path);
+			Files.delete(path);
+			Files.delete(path.getParent());
+		} catch (FileDoesNotExist fileDoesNotExist) {
+			ResponseEntity r = new ResponseEntity(HttpStatus.NOT_FOUND);
+			fileDoesNotExist.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		} catch (StorageException e) {
-			log.error("Failed to get resource " + req.getId() + "for user " + username);
-			return ResponseEntity.badRequest().build();
+			e.printStackTrace();
 		}
+		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping(value = "/files/getall", consumes = "application/json",produces = "application/json")
+	@GetMapping(value = "/files/getall", consumes = "application/json", produces = "application/json")
 	@ApiOperation(value = "Get info about all  uploaded by user", consumes = "application/json", produces = "application/json")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "User was authorized and server returned all user's files info"),
@@ -101,7 +109,7 @@ public class FileAccessREST {
 		}
 		String username = tokenManager.getUsername(jwt);
 		List<File> files = fileInfoRepository.getAllFiles(username);
-		log.info("Returning fileList("+files.size()+" items)");
+		log.info("Returning fileList(" + files.size() + " items)");
 		return new ResponseEntity<>(files, HttpStatus.OK);
 	}
 }

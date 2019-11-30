@@ -73,7 +73,6 @@ public class File {
 			case "odt":
 				return "OpenDocument";
 			default:
-				log.warn("Unknown extension of file: " + extension);
 				return extension + " file";
 		}
 	}
