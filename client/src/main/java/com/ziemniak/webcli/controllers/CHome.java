@@ -3,6 +3,7 @@ package com.ziemniak.webcli.controllers;
 import com.ziemniak.webcli.ClientApplication;
 import com.ziemniak.webcli.File;
 import com.ziemniak.webcli.dto.FileUploadPositiveResponseDTO;
+import com.ziemniak.webcli.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -19,10 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 
 @Controller
@@ -38,7 +36,7 @@ public class CHome {
 		//pobranie listy publikacji
 		try {
 			File[] files = fetchFileList(jwt);
-			model.addAttribute("fileList",files);
+			model.addAttribute("fileList", files);
 		} catch (HttpClientErrorException e) {
 			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 				log.warn("Error while fetching files due to expired or invalid JWT");
@@ -61,7 +59,7 @@ public class CHome {
 			model.addAttribute("errorreason", "File was empty");
 			return "redirect:/home";
 		}
-		Path pathToTemp = saveTemp(file);
+		Path pathToTemp = FileUtils.saveTemp(file);
 		FileSystemResource resource = new FileSystemResource(pathToTemp) {
 			@Override
 			public String getFilename() {
@@ -107,34 +105,6 @@ public class CHome {
 		new java.io.File(pathToTemp.toUri()).delete();
 		log.info("Deleted temporary file " + pathToTemp.getFileName());
 		return "redirect:/home";
-	}
-
-	/**
-	 * Zapisuje plik tymczasowo na dysku
-	 *
-	 * @param file plik do zapisania
-	 * @return ścieżka do pliku
-	 */
-	private Path saveTemp(MultipartFile file) {
-		new java.io.File("temp").mkdir();
-		java.io.File f = null;
-		int i = 1;
-		while (true){
-			f= new java.io.File("temp"+ java.io.File.separator+i);
-			if(f.exists()){
-				i+=1;
-			}else{
-				break;
-			}
-		}
-		log.info("Saving " + file.getName() + " temporarily on disc as " + f.toPath());
-		try {
-			InputStream inputStream = file.getInputStream();
-			Files.copy(inputStream, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return f.toPath();
 	}
 
 	/**
