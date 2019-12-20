@@ -1,10 +1,35 @@
 # Projektowanie aplikacji mobilnych i webowych
 
-Aplikacia do zarządzania bibliografią. 
+Aplikacia do zarządzania bibliografią. Umożliwia:
+- dodawanie plików 
+- pobieranie dodanych plików
+- dodawanie pozycji bibliograficznych(TODO)
+- usuwanie pozycji bibliograficznych(TODO)
+- pokazywanie plików przypiętych do pozycji bibliograficznych
 
-## Uruchamianie
+## Backend aplikacji
 
-W celu uruchomienia aplikacji należy w głównym folderze
+Przechowuje dane o użytkownikach, ich plkach i pozycjach bibliograficznych. Umożliwia autoryzację
+przez JWT przeyłany jako cisateczko o nazwie jwt.
+
+Backend aplikacji działą pod tym [adresem](https://ziemback.herokuapp.com)
+
+### Dodatkowe zabezpieczenia(TODO)
+
+## Strona interentowa
+
+TODO
+
+
+## Aplkacja mobilna
+TODO
+Aplikacja mobilna umożliwia logowanie i rejstracje oraz wyświetlanie,
+dodawanie, usuwanie pozycji bibliograficznych oraz podpinanie i odpinanie pod 
+te pozycje plików.
+
+## Uruchamianie lokalne
+
+W celu uruchomienia aplikacji lokalnie należy w głównym folderze
 projektu uruchomić skrypt
 
 ```bash
@@ -15,11 +40,9 @@ Po wykonaniu tych komend strona powinna działać pod tym  [adresem](http://loca
 
 ## Swagger
 
-Backend aplikacji jest udokumentowany w Swaggerze i dokumentacja powinna być dostęna po uruchomieniu serwera jako
+Backend aplikacji jest udokumentowany w Swaggerze i dokumentacja powinna być dostęna po lokalnym uruchomieniu serwera jako
 - [Swagger gui](http://localhost:42069/swagger-ui.html)
 - [JSON](http://localhost:42069/v2/api-docs)
-
-Dokumentacja jest też dostępna na [github pages](https://ziemniakoss.github.io/TworzenieAplikacjiMobilnychIWebowych/)
 
 ## Jak sprawdzić czy js sie wykonuje asynchronicznie
 
@@ -27,3 +50,13 @@ Podczas wpisywania nazwy użytkownika przy rejstracji aplikacja będzie na przy 
 zapytanie do serwera w celu sprawdzenia czy dana nazwa użytkownika jest dostępna:
 - jeżeli nie jest to nazwa użytkownika podświetli się na czerwono
 - w przeciwnym wypadku będzie zielona
+
+## Co jest dodane ponad wymagania
+- Strona internetowa działająca nawet w przeglądarkach niebługujących js
+- Strona internetowa wykrywa rozszerzenie pliku i jeżeli jest to np pdf to podaje pełną nazwę rozszerzenia. 
+Aktualnie obsługiwane są
+   - pdf
+   - dokumenty Worda
+   - OpenDocument(arkusze, dokumenty)
+   
+  
