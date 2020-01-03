@@ -1,6 +1,6 @@
 package com.ziemniak.webserv.repositories;
 
-import com.ziemniak.webserv.User;
+import com.ziemniak.webserv.Useraaa;
 import org.springframework.stereotype.Repository;
 import redis.clients.jedis.Jedis;
 
@@ -17,7 +17,7 @@ public  class UserRepository {
 		return result;
 	}
 
-	public void save(User user) {
+	public void save(Useraaa user) {
 		if (user == null) {
 			throw new NullPointerException();
 		}
@@ -27,7 +27,7 @@ public  class UserRepository {
 		j.close();
 	}
 
-	public User getUser(String nick) {
+	public Useraaa getUser(String nick) {
 		if (nick == null)
 			return null;
 		Jedis j = new Jedis();
@@ -36,13 +36,13 @@ public  class UserRepository {
 		if (stringStringMap.isEmpty()) {
 			return null;
 		}
-		User user = new User();
+		Useraaa user = new Useraaa();
 		user.setUsername(nick);
 		user.setPassword(stringStringMap.get("password"));
 		return user;
 	}
 
-	public void delete(User user) {
+	public void delete(Useraaa user) {
 		if (user == null) {
 			return;
 		}

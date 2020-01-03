@@ -1,9 +1,0 @@
-
-int main(int ac, char **av)
-{
-	int searched;
-	sscanf(av[1], "%u", &searched);
-	unsigned int umax = -1;
-	int m = umax;
-	printf("%d %u\n", m, m);
-}

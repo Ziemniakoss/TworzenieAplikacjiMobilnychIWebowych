@@ -55,7 +55,7 @@ public class RegisterREST {
 		Set<ConstraintViolation<RegisterRequestDTO>> violations = validator.validate(request);
 		if (violations.size() == 0) {
 			if (!userRepository.exists(request.getUsername())) {
-				User u = new User();
+				Useraaa u = new Useraaa();
 				u.setPassword(request.getPassword());
 				u.setUsername(request.getUsername());
 				userRepository.save(u);

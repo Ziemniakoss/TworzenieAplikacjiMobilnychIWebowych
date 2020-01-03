@@ -1,4 +1,4 @@
-package com.ziemniak.webserv;
+package com.ziemniak.webserv.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

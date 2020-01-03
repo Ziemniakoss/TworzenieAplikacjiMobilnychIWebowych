@@ -41,7 +41,7 @@ public class JwtRest {
 	})
 	public ResponseEntity createAuthorizationToken(@RequestBody LoginRequestDTO req) {
 		if (userRepository.exists(req.getUsername())) {
-			User u = userRepository.getUser(req.getUsername());
+			Useraaa u = userRepository.getUser(req.getUsername());
 			if (u.getPassword().equals(req.getPassword())) {
 				String jwt = tokenManager.create(req.getUsername(), new Date(System.currentTimeMillis() + JWT_DURABILITY));
 				LoginPositiveResponseDTO resp = new LoginPositiveResponseDTO();

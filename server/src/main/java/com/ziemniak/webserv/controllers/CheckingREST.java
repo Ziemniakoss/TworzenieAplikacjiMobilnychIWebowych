@@ -1,4 +1,4 @@
-package com.ziemniak.webserv;
+package com.ziemniak.webserv.controllers;
 
 import com.ziemniak.webserv.dto.UserNameCheckDTO;
 import com.ziemniak.webserv.repositories.UserRepository;
@@ -47,8 +47,8 @@ public class CheckingREST {
 	}
 
 	@GetMapping("/check/password/{password}")
-	public ResponseEntity checkPasswordStrength(@PathVariable(value = "password") String password) {
+	public String checkPasswordStrength(@PathVariable(value = "password") String password) {
 		//TODO
-		return null;
+		return "ok";
 	}
 }

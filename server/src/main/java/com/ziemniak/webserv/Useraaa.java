@@ -1,11 +1,18 @@
 package com.ziemniak.webserv;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 
-public class User implements Serializable {
+public class Useraaa implements Serializable {
     private String username;
     private String password;
+
+    public Useraaa(String foo, String foo1, ArrayList<Object> objects) {
+    }
+
+    public Useraaa() {
+    }
 
     public String getUsername() {
         return username;
