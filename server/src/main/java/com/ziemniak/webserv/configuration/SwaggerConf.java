@@ -11,9 +11,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.ArrayList;
 
-/**
- * Configuration for Swagger
- */
 @Configuration
 @EnableSwagger2
 public class SwaggerConf {
