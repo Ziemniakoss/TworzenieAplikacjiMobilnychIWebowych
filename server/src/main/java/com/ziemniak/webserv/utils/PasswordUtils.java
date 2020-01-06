@@ -76,7 +76,7 @@ public class PasswordUtils {
 	 *                 pusty ciąg znaków
 	 * @throws PasswordValidationException jeżeli hasło jest nieprawidłowe
 	 */
-	public void getValidationErrors(String password) throws PasswordValidationException {
+	public void validate(String password) throws PasswordValidationException {
 		if(password == null){
 			password = "";
 		}

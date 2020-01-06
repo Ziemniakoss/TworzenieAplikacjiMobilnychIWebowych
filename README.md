@@ -10,11 +10,13 @@ Aplikacia do zarządzania bibliografią. Umożliwia:
 ## Backend aplikacji
 
 Przechowuje dane o użytkownikach, ich plkach i pozycjach bibliograficznych. Umożliwia autoryzację
-przez JWT przeyłany jako cisateczko o nazwie jwt.
+przez JWT. JWT musi być przesyłany w nagłówku Authorization
 
 Backend aplikacji działą pod tym [adresem](https://ziemback.herokuapp.com)
 
-### Dodatkowe zabezpieczenia(TODO)
+### Zabezpieczenia
+#### Hashowanie haseł
+Wszsytkie hasła wprowadzane do bazy danych są hashowane algorytmem BCyptr
 
 ## Strona interentowa
 

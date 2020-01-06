@@ -2,7 +2,7 @@ package com.ziemniak.webserv.controllers;
 
 import com.ziemniak.webserv.dto.CheckPasswordRequestDTO;
 import com.ziemniak.webserv.dto.UserNameCheckDTO;
-import com.ziemniak.webserv.repositories.UserRepository;
+import com.ziemniak.webserv.repositories.users.UserRepository;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +35,7 @@ public class CheckingREST {
 		headers.add("Access-Control-Allow-Origin", "*");
 
 		UserNameCheckDTO resonse;
-		if (userRepository.exists(username)) {
+		if (userRepository.userExists(username)) {
 			resonse = new UserNameCheckDTO(username, false,"Not available");
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).header(String.valueOf(headers)).body(resonse);
 		} else {

@@ -1,6 +1,5 @@
 package com.ziemniak.webserv.utils;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,7 @@ class PasswordUtilsTest {
 			"alamakota"
 	})
 	void validateIncorrectPasswords(String password) {
-		assertThrows(PasswordValidationException.class, ()->ps.getValidationErrors(password));
+		assertThrows(PasswordValidationException.class, ()->ps.validate(password));
 	}
 
 

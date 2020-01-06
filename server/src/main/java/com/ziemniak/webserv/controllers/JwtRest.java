@@ -1,8 +1,11 @@
-package com.ziemniak.webserv;
+package com.ziemniak.webserv.controllers;
 
+import com.ziemniak.webserv.TokenManager;
+import com.ziemniak.webserv.Useraaa;
 import com.ziemniak.webserv.dto.*;
 import com.ziemniak.webserv.repositories.BlacklistedJwtRepository;
-import com.ziemniak.webserv.repositories.UserRepository;
+import com.ziemniak.webserv.repositories.users.UserDoesNotExistException;
+import com.ziemniak.webserv.repositories.users.UserRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -12,6 +15,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +38,8 @@ public class JwtRest {
 	private UserRepository userRepository;
 	@Autowired
 	private TokenManager tokenManager;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@PostMapping(value = "/auth/login", produces = "application/json", consumes = "application/json")
 	@ApiOperation(value = "Login with username and password and receive jwt", produces = "application/json", consumes = "application/json")
@@ -40,17 +48,17 @@ public class JwtRest {
 			@ApiResponse(code = 401, message = "Given password or login was not correct", response = LoginNegativeResponseDTO.class)
 	})
 	public ResponseEntity createAuthorizationToken(@RequestBody LoginRequestDTO req) {
-		if (userRepository.exists(req.getUsername())) {
-			Useraaa u = userRepository.getUser(req.getUsername());
-			if (u.getPassword().equals(req.getPassword())) {
+		try{
+			User user = userRepository.getUser(req.getUsername());
+			if(passwordEncoder.matches(req.getPassword(),user.getPassword())){
 				String jwt = tokenManager.create(req.getUsername(), new Date(System.currentTimeMillis() + JWT_DURABILITY));
 				LoginPositiveResponseDTO resp = new LoginPositiveResponseDTO();
 				resp.setJwt(jwt);
 				return new ResponseEntity<>(resp, HttpStatus.OK);
 			}
-			return new ResponseEntity<>(new LoginNegativeResponseDTO("Wrong password"), HttpStatus.UNAUTHORIZED);
+		}catch (UsernameNotFoundException ignored){
 		}
-		return new ResponseEntity<>(new LoginNegativeResponseDTO("User does not exists"), HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<>(new LoginNegativeResponseDTO("Username or password is not correct"), HttpStatus.UNAUTHORIZED);
 	}
 
 	@PostMapping(value = "/auth/logout", produces = "application/json", consumes = "application/json")
