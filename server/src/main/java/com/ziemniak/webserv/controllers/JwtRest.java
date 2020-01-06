@@ -35,31 +35,8 @@ public class JwtRest {
 	@Autowired
 	private BlacklistedJwtRepository blackList;
 	@Autowired
-	private UserRepository userRepository;
-	@Autowired
 	private TokenManager tokenManager;
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 
-	@PostMapping(value = "/auth/login", produces = "application/json", consumes = "application/json")
-	@ApiOperation(value = "Login with username and password and receive jwt", produces = "application/json", consumes = "application/json")
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "Login was successful", response = LoginPositiveResponseDTO.class),
-			@ApiResponse(code = 401, message = "Given password or login was not correct", response = LoginNegativeResponseDTO.class)
-	})
-	public ResponseEntity createAuthorizationToken(@RequestBody LoginRequestDTO req) {
-		try{
-			User user = userRepository.getUser(req.getUsername());
-			if(passwordEncoder.matches(req.getPassword(),user.getPassword())){
-				String jwt = tokenManager.create(req.getUsername(), new Date(System.currentTimeMillis() + JWT_DURABILITY));
-				LoginPositiveResponseDTO resp = new LoginPositiveResponseDTO();
-				resp.setJwt(jwt);
-				return new ResponseEntity<>(resp, HttpStatus.OK);
-			}
-		}catch (UsernameNotFoundException ignored){
-		}
-		return new ResponseEntity<>(new LoginNegativeResponseDTO("Username or password is not correct"), HttpStatus.UNAUTHORIZED);
-	}
 
 	@PostMapping(value = "/auth/logout", produces = "application/json", consumes = "application/json")
 	@ApiOperation(value = "Blacklist JWT", produces = "application/json", consumes = "application/json")

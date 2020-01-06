@@ -31,7 +31,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/auth/register")
 @CrossOrigin()
-@Api(description = "Allows to create new user in database")
+@Api(description = "Pozwala na rejstrowanie się")
 public class RegisterREST {
 	private final Logger log = LoggerFactory.getLogger(RegisterREST.class);
 	@Autowired
@@ -44,11 +44,11 @@ public class RegisterREST {
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "User was created", response = RegisterResponseDTO.class),
 			@ApiResponse(code = 400,
-					message = "User was not created. It might be caused by illegal password value, " +
-							"not matching passwords or the fact that user with given username already exists in database",
+					message = "Użytkownik nie został utworzony. Mogło to być spowodwane albo faktem, że " +
+							"użytkownik z podaną nazwą już istnieje w bazie danych albo hasło nie spełniało norm",
 					response = RegisterResponseDTO.class)
 	})
-	@ApiOperation(value = "Create new user in database", produces = "application/json", consumes = "application/json")
+	@ApiOperation(value = "Tworzy nowego użytkownika w bazie danych", produces = "application/json", consumes = "application/json")
 	public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request) throws PasswordValidationException, UserAlreadyExistsException {
 		boolean accepted = false;
 		List<String> errors = new ArrayList<>();

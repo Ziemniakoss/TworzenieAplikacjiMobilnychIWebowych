@@ -14,10 +14,6 @@ przez JWT. JWT musi być przesyłany w nagłówku Authorization
 
 Backend aplikacji działą pod tym [adresem](https://ziemback.herokuapp.com)
 
-### Zabezpieczenia
-#### Hashowanie haseł
-Wszsytkie hasła wprowadzane do bazy danych są hashowane algorytmem BCyptr
-
 ## Strona interentowa
 
 TODO
@@ -60,5 +56,20 @@ Aktualnie obsługiwane są
    - pdf
    - dokumenty Worda
    - OpenDocument(arkusze, dokumenty)
+   
+## Zabezpieczenia na zaliczenie ochrone danych(backend)
+- Wszystkie dane wejściowe są walidowane
+- Hasła przechowywane w bazie są hashowane za pomocą 
+[bcrypt](https://en.wikipedia.org/wiki/Bcrypt) o mocy 15(2<sup>15</sup> iteracji).
+- Spowolnienie przetwarzania prośby o logowanie (poprzez hashowanie z dużą ilością iteracji)
+- Kontrola siły hasła. Hasło musi mieć entropię przynajmniej 
+15 i musi spełniac poniższe warunki:
+    - Musi mieć przynajmniej 8 znaków
+    - Musi zawierać przynajmniej jedną wielką literę
+    - Musi zawierać przynajmniej jedną małą literę
+    - Musi zawierać przynajmniej jedną cyfrę
+    - Musi zawierać przynajmniej jeden znak specjalny
+- Podczas podania niepopeawnych danych logowania nie jest podana dokładna
+przyczyna odrzucenia żądania. 
    
   
