@@ -1,5 +1,6 @@
 package com.ziemniak.webserv.controllers;
 
+import com.ziemniak.webserv.dto.CheckPasswordRequestDTO;
 import com.ziemniak.webserv.dto.UserNameCheckDTO;
 import com.ziemniak.webserv.repositories.UserRepository;
 import io.swagger.annotations.*;
@@ -7,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Allows to chceck if given nick is available and how strong password is
@@ -46,8 +44,9 @@ public class CheckingREST {
 		}
 	}
 
-	@GetMapping("/check/password/{password}")
-	public String checkPasswordStrength(@PathVariable(value = "password") String password) {
+	@GetMapping("/check/password")
+	@ApiOperation(value = "Pozwala na sprawdzenie jak silne jest hasło")
+	public String checkPasswordStrength(@RequestBody CheckPasswordRequestDTO req) {
 		//TODO
 		return "ok";
 	}
