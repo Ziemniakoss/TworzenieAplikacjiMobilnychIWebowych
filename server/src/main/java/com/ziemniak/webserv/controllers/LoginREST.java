@@ -1,10 +1,9 @@
 package com.ziemniak.webserv.controllers;
 
-import com.ziemniak.webserv.TokenManager;
+import com.ziemniak.webserv.utils.JwtUtils;
 import com.ziemniak.webserv.dto.LoginNegativeResponseDTO;
 import com.ziemniak.webserv.dto.LoginPositiveResponseDTO;
 import com.ziemniak.webserv.dto.LoginRequestDTO;
-import com.ziemniak.webserv.repositories.BlacklistedJwtRepository;
 import com.ziemniak.webserv.repositories.users.UserRepository;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -27,7 +26,7 @@ public class LoginREST {
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
-	private TokenManager tokenManager;
+	private JwtUtils jwtUtils;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
@@ -41,7 +40,7 @@ public class LoginREST {
 		try{//todo opznienia
 			User user = userRepository.getUser(req.getUsername());
 			if(passwordEncoder.matches(req.getPassword(),user.getPassword())){
-				String jwt = tokenManager.create(req.getUsername(), new Date(System.currentTimeMillis() + JWT_DURABILITY));
+				String jwt = jwtUtils.create(req.getUsername(), new Date(System.currentTimeMillis() + JWT_DURABILITY));
 				LoginPositiveResponseDTO resp = new LoginPositiveResponseDTO();
 				resp.setJwt(jwt);
 				return new ResponseEntity<>(resp, HttpStatus.OK);

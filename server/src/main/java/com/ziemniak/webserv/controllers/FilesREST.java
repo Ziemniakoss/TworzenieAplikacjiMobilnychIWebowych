@@ -1,11 +1,15 @@
 package com.ziemniak.webserv;
 
+import com.ziemniak.webserv.dto.FileShareRequestDTO;
 import com.ziemniak.webserv.dto.FileUploadPositiveResponseDTO;
+import com.ziemniak.webserv.dto.RevokeAccessToFileRequestDTO;
 import com.ziemniak.webserv.filestorage.File;
 import com.ziemniak.webserv.filestorage.FileDoesNotExist;
 import com.ziemniak.webserv.filestorage.StorageException;
 import com.ziemniak.webserv.filestorage.StorageService;
 import com.ziemniak.webserv.repositories.FileInfoRepository;
+import com.ziemniak.webserv.repositories.files.FileRepository;
+import com.ziemniak.webserv.utils.JwtUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -29,15 +33,17 @@ import java.util.List;
 
 @RestController
 @Api(description = "Allows to access files stored on server")
-public class FileAccessREST {
+public class FilesREST {
 	@Autowired
 	private StorageService storage;
 	@Autowired
-	private TokenManager tokenManager;
+	private JwtUtils jwtUtils;
 	@Autowired
 	private FileInfoRepository fileInfoRepository;
+	@Autowired
+	private FileRepository fileRepository;
 
-	private final Logger log = LoggerFactory.getLogger(FileAccessREST.class);
+	private final Logger log = LoggerFactory.getLogger(FilesREST.class);
 
 	@PostMapping(value = "/files/add", produces = "application/json")
 	@ApiOperation(value = "Creates new file in database")
@@ -47,11 +53,11 @@ public class FileAccessREST {
 	})
 	public ResponseEntity add(@CookieValue(value = "jwt", defaultValue = "") String jwt, @RequestParam("file") MultipartFile file, @RequestParam("fileName") String filename) {
 		System.err.println(file.getOriginalFilename());
-		if (!tokenManager.verify(jwt)) {
+		if (!jwtUtils.verify(jwt)) {
 			log.warn("Someone tried to add file without valid JWT");
 			return new ResponseEntity<>("JWT is not valid", HttpStatus.UNAUTHORIZED);
 		}
-		String username = tokenManager.getUsername(jwt);
+		String username = jwtUtils.getUsername(jwt);
 		log.info('"' + username + "\" is adding file " + file.getName());
 		try {
 			storage.store(username, file, filename);
@@ -66,11 +72,11 @@ public class FileAccessREST {
 
 	@GetMapping(value = "/files/get/{id}", produces = "multipart/mixed")
 	public ResponseEntity getFile(HttpServletResponse response, @PathVariable String id, @CookieValue(value = "jwt", defaultValue = "") String jwt) {
-		if (!tokenManager.verify(jwt)) {
+		if (!jwtUtils.verify(jwt)) {
 			log.warn("Someone tried to download file without valid JWT(" + jwt + ')');
 			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 		}
-		String username = tokenManager.getUsername(jwt);
+		String username = jwtUtils.getUsername(jwt);
 		try {
 			File f = fileInfoRepository.getFile(username, id);
 			response.setHeader("Content-disposition", "attachment; filename=" + f.getName());
@@ -103,13 +109,23 @@ public class FileAccessREST {
 			@ApiResponse(code = 401, message = "jwt cookie contained invalid JWT")
 	})
 	private ResponseEntity getAll(@CookieValue(value = "jwt", defaultValue = "") String jwt, HttpServletRequest httpServletRequest) {
-		if (!tokenManager.verify(jwt)) {
+		if (!jwtUtils.verify(jwt)) {
 			log.warn("Someone used invalid JWT(" + jwt + ")");
 			return new ResponseEntity<>("JWT is not valid", HttpStatus.UNAUTHORIZED);
 		}
-		String username = tokenManager.getUsername(jwt);
+		String username = jwtUtils.getUsername(jwt);
 		List<File> files = fileInfoRepository.getAllFiles(username);
 		log.info("Returning fileList(" + files.size() + " items)");
 		return new ResponseEntity<>(files, HttpStatus.OK);
+	}
+
+	@PostMapping("/files/share")
+	public ResponseEntity<?> shareFile(@RequestBody FileShareRequestDTO fileShareRequest, HttpServletRequest req){
+
+	}
+
+	@PostMapping("/files/revokeaccess")
+	public ResponseEntity<?> revokeAccessToFile(@RequestBody RevokeAccessToFileRequestDTO revokeRequest, HttpServletRequest req){
+
 	}
 }

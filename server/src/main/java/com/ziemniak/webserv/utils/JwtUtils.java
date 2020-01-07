@@ -1,4 +1,4 @@
-package com.ziemniak.webserv;
+package com.ziemniak.webserv.utils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.Map;
 
 @Component
-public class TokenManager {
-	private final Logger log = LoggerFactory.getLogger(TokenManager.class);
+public class JwtUtils {
+	private final Logger log = LoggerFactory.getLogger(JwtUtils.class);
 	private String secret = "sekrecik";//Todo ukyć go
 
 	@Autowired
