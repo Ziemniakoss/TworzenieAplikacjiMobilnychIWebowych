@@ -6,21 +6,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class BibliographyREST {
+public class BibliographyFilesREST {
 
-	@GetMapping("/bibliography/get")
-	public void getBibliographyInfo() {
-
-	}
-
-	@GetMapping("/bibliography/getall")
-	public void getAllBibliographies() {
+	@GetMapping("/bibliography/files")
+	public void getAllFilesInBibliography() {
 
 	}
 
-	@PostMapping("/bibliography/add")
-	public void createBibliography() {
+	@PostMapping("/bibliography/files/add")
+	public void addFileToBibliography() {
 
 	}
 
+	@DeleteMapping("/bibliography/files/delete")
+	public void deleteFileFromBibliography(){
+
+	}
 }
