@@ -1,9 +1,11 @@
-package com.ziemniak.webserv;
+package com.ziemniak.webserv.controllers;
 
 import com.ziemniak.webserv.dto.RegisterRequestDTO;
 import com.ziemniak.webserv.dto.RegisterResponseDTO;
 import com.ziemniak.webserv.filestorage.StorageService;
-import com.ziemniak.webserv.repositories.UserRepository;
+import com.ziemniak.webserv.repositories.users.UserAlreadyExistsException;
+import com.ziemniak.webserv.repositories.users.UserRepository;
+import com.ziemniak.webserv.utils.PasswordValidationException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -29,7 +31,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/auth/register")
 @CrossOrigin()
-@Api(description = "Allows to create new user in database")
+@Api(description = "Pozwala na rejstrowanie się")
 public class RegisterREST {
 	private final Logger log = LoggerFactory.getLogger(RegisterREST.class);
 	@Autowired
@@ -42,28 +44,25 @@ public class RegisterREST {
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "User was created", response = RegisterResponseDTO.class),
 			@ApiResponse(code = 400,
-					message = "User was not created. It might be caused by illegal password value, " +
-							"not matching passwords or the fact that user with given username already exists in database",
+					message = "Użytkownik nie został utworzony. Mogło to być spowodwane albo faktem, że " +
+							"użytkownik z podaną nazwą już istnieje w bazie danych albo hasło nie spełniało norm",
 					response = RegisterResponseDTO.class)
 	})
-	@ApiOperation(value = "Create new user in database", produces = "application/json", consumes = "application/json")
-	public ResponseEntity register(@RequestBody RegisterRequestDTO request) {
+	@ApiOperation(value = "Tworzy nowego użytkownika w bazie danych", produces = "application/json", consumes = "application/json")
+	public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request) throws PasswordValidationException, UserAlreadyExistsException {
 		boolean accepted = false;
 		List<String> errors = new ArrayList<>();
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();//todo wrzucenie jako beana
 		Validator validator = factory.getValidator();
 		Set<ConstraintViolation<RegisterRequestDTO>> violations = validator.validate(request);
 		if (violations.size() == 0) {
-			if (!userRepository.exists(request.getUsername())) {
-				Useraaa u = new Useraaa();
-				u.setPassword(request.getPassword());
-				u.setUsername(request.getUsername());
-				userRepository.save(u);
-				log.info("Added new user with username \'" + u.getUsername() + "\'");
+			if (!userRepository.userExists(request.getUsername())) {
+				userRepository.add(request.getUsername(),request.getPassword());//todo refactor
+				log.info("Added new user with username '" + request.getUsername() + "'");
 				accepted = true;
-				storageService.addUser(u.getUsername());
+				storageService.addUser(request.getUsername());
 			} else {
-				errors.add("User with username \'" + request.getUsername() + "\' already exists");
+				errors.add("User with username '" + request.getUsername() + "' already exists");
 			}
 		} else {
 			for (ConstraintViolation<RegisterRequestDTO> viol : violations) {
@@ -76,7 +75,7 @@ public class RegisterREST {
 		body.setErrors(errors);
 		body.setUsername(request.getUsername());
 		if (accepted)
-			return new ResponseEntity(body, HttpStatus.OK);
+			return new ResponseEntity<RegisterResponseDTO>(body, HttpStatus.OK);
 		else
 			return new ResponseEntity(body, HttpStatus.BAD_REQUEST);
 	}
