@@ -2,7 +2,6 @@ package com.ziemniak.webserv.controllers;
 
 import com.ziemniak.webserv.dto.RegisterRequestDTO;
 import com.ziemniak.webserv.dto.RegisterResponseDTO;
-import com.ziemniak.webserv.filestorage.StorageService;
 import com.ziemniak.webserv.repositories.users.UserAlreadyExistsException;
 import com.ziemniak.webserv.repositories.users.UserRepository;
 import com.ziemniak.webserv.utils.PasswordValidationException;
@@ -36,8 +35,7 @@ public class RegisterREST {
 	private final Logger log = LoggerFactory.getLogger(RegisterREST.class);
 	@Autowired
 	private UserRepository userRepository;
-	@Autowired
-	private StorageService storageService;
+
 
 	@PostMapping(produces = "application/json", consumes = "application/json")
 	@CrossOrigin(origins = "*")
@@ -60,7 +58,6 @@ public class RegisterREST {
 				userRepository.add(request.getUsername(),request.getPassword());//todo refactor
 				log.info("Added new user with username '" + request.getUsername() + "'");
 				accepted = true;
-				storageService.addUser(request.getUsername());
 			} else {
 				errors.add("User with username '" + request.getUsername() + "' already exists");
 			}

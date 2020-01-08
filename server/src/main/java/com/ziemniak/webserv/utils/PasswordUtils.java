@@ -64,7 +64,7 @@ public class PasswordUtils {
 	/**
 	 * Waliduje czy hasło może być użyte. Poprawne hasło:
 	 * <ul>
-	 *     <li>ma przynajmniej 8 znaków</li>
+	 *     <li>ma przynajmniej 6 znaków</li>
 	 *     <li>posiada przynajmniej jedną wielką litere</li>
 	 *     <li>posiada przynajmniej jendą małą literę</li>
 	 *     <li>posiada przynajmniej jedną cyfrę</li>
@@ -81,7 +81,7 @@ public class PasswordUtils {
 			password = "";
 		}
 		List<String> errors = new ArrayList<>();
-		if(password.length() < 8){
+		if(password.length() < 6){
 			errors.add("Hasło jest za krótkie");
 		}
 		boolean containsUpperCase = false;

@@ -60,7 +60,7 @@ Aktualnie obsługiwane są
 ## Zabezpieczenia na zaliczenie ochrone danych(backend)
 - Wszystkie dane wejściowe są walidowane
 - Hasła przechowywane w bazie są hashowane za pomocą 
-[bcrypt](https://en.wikipedia.org/wiki/Bcrypt) o mocy 15(2<sup>15</sup> iteracji).
+[bcrypt](https://en.wikipedia.org/wiki/Bcrypt) o mocy 12(2<sup>12</sup> iteracji).
 - Spowolnienie przetwarzania prośby o logowanie (poprzez hashowanie z dużą ilością iteracji)
 - Kontrola siły hasła. Hasło musi mieć entropię przynajmniej 
 15 i musi spełniac poniższe warunki:

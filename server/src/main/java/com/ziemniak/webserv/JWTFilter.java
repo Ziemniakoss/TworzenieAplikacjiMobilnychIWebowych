@@ -1,5 +1,6 @@
 package com.ziemniak.webserv;
 
+import com.ziemniak.webserv.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,8 @@ import java.io.IOException;
 public class JWTFilter extends OncePerRequestFilter {
     @Autowired
     private MyUserDetailsService userDetailsService;
+    @Autowired
+private     JwtUtils jwtUtils;
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
         //TODO
@@ -24,7 +27,9 @@ public class JWTFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
         if(authHeader != null){
-            UserDetails user = userDetailsService.loadUserByUsername("foo");
+            jwt = authHeader.substring(7);
+            username = jwtUtils.getUsername(jwt);
+            UserDetails user = userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null,user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(token);
         }

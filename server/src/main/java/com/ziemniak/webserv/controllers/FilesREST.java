@@ -1,14 +1,12 @@
-package com.ziemniak.webserv;
+package com.ziemniak.webserv.controllers;
 
+import com.ziemniak.webserv.repositories.files.FileDoesNotExistException;
+import com.ziemniak.webserv.repositories.files.FileInfo;
 import com.ziemniak.webserv.dto.FileShareRequestDTO;
 import com.ziemniak.webserv.dto.FileUploadPositiveResponseDTO;
 import com.ziemniak.webserv.dto.RevokeAccessToFileRequestDTO;
-import com.ziemniak.webserv.filestorage.File;
-import com.ziemniak.webserv.filestorage.FileDoesNotExist;
-import com.ziemniak.webserv.filestorage.StorageException;
-import com.ziemniak.webserv.filestorage.StorageService;
-import com.ziemniak.webserv.repositories.FileInfoRepository;
 import com.ziemniak.webserv.repositories.files.FileRepository;
+import com.ziemniak.webserv.repositories.users.UserDoesNotExistException;
 import com.ziemniak.webserv.utils.JwtUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,22 +22,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
 @Api(description = "Allows to access files stored on server")
 public class FilesREST {
 	@Autowired
-	private StorageService storage;
-	@Autowired
 	private JwtUtils jwtUtils;
-	@Autowired
-	private FileInfoRepository fileInfoRepository;
 	@Autowired
 	private FileRepository fileRepository;
 
@@ -51,55 +40,28 @@ public class FilesREST {
 			@ApiResponse(code = 200, message = "User was authorized and file was created successfully", response = FileUploadPositiveResponseDTO.class),
 			@ApiResponse(code = 401, message = "User used invalid or expired JWT", response = String.class)
 	})
-	public ResponseEntity add(@CookieValue(value = "jwt", defaultValue = "") String jwt, @RequestParam("file") MultipartFile file, @RequestParam("fileName") String filename) {
-		System.err.println(file.getOriginalFilename());
-		if (!jwtUtils.verify(jwt)) {
-			log.warn("Someone tried to add file without valid JWT");
-			return new ResponseEntity<>("JWT is not valid", HttpStatus.UNAUTHORIZED);
-		}
-		String username = jwtUtils.getUsername(jwt);
+	public ResponseEntity add(@RequestParam("file") MultipartFile file, @RequestParam("fileName") String filename, HttpServletRequest req) {
+		String username = jwtUtils.getUsername(req.getHeader("Authorization").substring(7));
 		log.info('"' + username + "\" is adding file " + file.getName());
-		try {
-			storage.store(username, file, filename);
-			log.info(username + " added  file " + file.getName());
-			return new ResponseEntity<>(new FileUploadPositiveResponseDTO(file.getName()), HttpStatus.OK);
-		} catch (StorageException e) {
-			log.error("Failed to save file " + file.getName() + " for user " + username);
-			e.printStackTrace();
-		}
-		return null;//todo
+		fileRepository.saveFile(username, file);
+		log.info(username + " added  file " + file.getName());
+		return new ResponseEntity<>(new FileUploadPositiveResponseDTO(file.getName()), HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/files/get/{id}", produces = "multipart/mixed")
-	public ResponseEntity getFile(HttpServletResponse response, @PathVariable String id, @CookieValue(value = "jwt", defaultValue = "") String jwt) {
-		if (!jwtUtils.verify(jwt)) {
-			log.warn("Someone tried to download file without valid JWT(" + jwt + ')');
-			return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+	@GetMapping(value = "/files/get/{id}")// TODO: 1/8/20 swagger 
+	public ResponseEntity<?> getFile(@PathVariable int id, HttpServletRequest req, HttpServletResponse resp) {
+		String username = getUsernameFromJwt(req);
+		if (!fileRepository.hasAccess(id, username)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		String username = jwtUtils.getUsername(jwt);
+
 		try {
-			File f = fileInfoRepository.getFile(username, id);
-			response.setHeader("Content-disposition", "attachment; filename=" + f.getName());
-			OutputStream out = response.getOutputStream();
-			Path path = Paths.get(storage.get(username, id).toURI());
-			log.info("Sending file " + path.toUri());
-			Files.copy(path, out);
-			out.close();
-
-
-			//usuwam plik tymczasowy
-			log.info("Deleting temporarty file: " + path);
-			Files.delete(path);
-			Files.delete(path.getParent());
-		} catch (FileDoesNotExist fileDoesNotExist) {
-			ResponseEntity r = new ResponseEntity(HttpStatus.NOT_FOUND);
-			fileDoesNotExist.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (StorageException e) {
-			e.printStackTrace();
+			byte[] file = fileRepository.getFile(id);
+			resp.setHeader("Content-disposition", "attachment; filename=test");//todo faktyczna nazwa
+			return ResponseEntity.ok(file);
+		} catch (FileDoesNotExistException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
-		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping(value = "/files/getall", consumes = "application/json", produces = "application/json")
@@ -114,18 +76,31 @@ public class FilesREST {
 			return new ResponseEntity<>("JWT is not valid", HttpStatus.UNAUTHORIZED);
 		}
 		String username = jwtUtils.getUsername(jwt);
-		List<File> files = fileInfoRepository.getAllFiles(username);
-		log.info("Returning fileList(" + files.size() + " items)");
-		return new ResponseEntity<>(files, HttpStatus.OK);
+		List<FileInfo> fileInfos = null;
+		try {
+			fileInfos = fileRepository.getAllOwnedFilesInfo(username);
+		} catch (UserDoesNotExistException e) {
+			//todo
+		}
+		log.info("Returning fileList(" + fileInfos.size() + " items)");
+		return new ResponseEntity<>(fileInfos, HttpStatus.OK);
 	}
 
 	@PostMapping("/files/share")
-	public ResponseEntity<?> shareFile(@RequestBody FileShareRequestDTO fileShareRequest, HttpServletRequest req){
-
+	public ResponseEntity<?> shareFile(@RequestBody FileShareRequestDTO fileShareRequest, HttpServletRequest req) {
+		String jwt = req.getHeader("Authorization");
+		//todo
+		return null;
 	}
 
 	@PostMapping("/files/revokeaccess")
-	public ResponseEntity<?> revokeAccessToFile(@RequestBody RevokeAccessToFileRequestDTO revokeRequest, HttpServletRequest req){
+	public ResponseEntity<?> revokeAccessToFile(@RequestBody RevokeAccessToFileRequestDTO revokeRequest, HttpServletRequest req) {
+		String owner = getUsernameFromJwt(req);
 
+		return null;
+	}
+
+	private String getUsernameFromJwt(HttpServletRequest req) {
+		return jwtUtils.getUsername(req.getHeader("Authorization").substring(7));
 	}
 }

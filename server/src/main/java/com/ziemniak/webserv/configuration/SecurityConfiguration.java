@@ -52,7 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) {
 		web.ignoring().antMatchers("/v2/api-docs",
-				"/configuration/ui",
+	//			"/configuration/ui",
 				"/swagger-resources/**",
 //				"/configuration/security",
 				"/swagger-ui.html",
@@ -61,7 +61,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder(15);
+		return new BCryptPasswordEncoder(12);
 	}
 
 	@Autowired
