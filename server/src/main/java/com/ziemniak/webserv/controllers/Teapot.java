@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 
 @RestController
 @Api(description = "Herbatka dla każdego")
-public class TeapotREST {
+public class Teapot {
 	@GetMapping("/coffee")
 	@ApiOperation(value = "Wysyła żądanie o kawe", produces = "text")
 	@ApiResponse(code = 418, message = "Tutaj serwujemy jedynie herbatke")

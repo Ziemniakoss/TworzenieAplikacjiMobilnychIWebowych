@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 
 @RestController
-public class LoginREST {
+public class Login {
 	private static final int JWT_DURABILITY = 5 * 1000 * 60;//5min
 	@Autowired
 	private UserRepository userRepository;

@@ -31,8 +31,8 @@ import java.util.Set;
 @RequestMapping("/auth/register")
 @CrossOrigin()
 @Api(description = "Pozwala na rejstrowanie się")
-public class RegisterREST {
-	private final Logger log = LoggerFactory.getLogger(RegisterREST.class);
+public class Register {
+	private final Logger log = LoggerFactory.getLogger(Register.class);
 	@Autowired
 	private UserRepository userRepository;
 

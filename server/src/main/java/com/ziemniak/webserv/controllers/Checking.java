@@ -19,7 +19,7 @@ import java.util.List;
  */
 @RestController()
 @Api(description = "Umożliwia na sprwadzanie dostępności haseł i nicków")
-public class CheckingREST {
+public class Checking {
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired

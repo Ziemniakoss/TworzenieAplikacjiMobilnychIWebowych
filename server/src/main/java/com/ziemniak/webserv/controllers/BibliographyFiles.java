@@ -7,21 +7,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 //todo
-public class BibliographyREST {
+public class BibliographyFiles {
 
-	@GetMapping("/bibliography/get")
-	public void getBibliographyInfo() {
-
-	}
-
-	@GetMapping("/bibliography/getall")
-	public void getAllBibliographies() {
+	@GetMapping("/bibliography/files")
+	public void getAllFilesInBibliography() {
 
 	}
 
-	@PostMapping("/bibliography/add")
-	public void createBibliography() {
+	@PostMapping("/bibliography/files/add")
+	public void addFileToBibliography() {
 
 	}
 
+	@DeleteMapping("/bibliography/files/delete")
+	public void deleteFileFromBibliography(){
+
+	}
 }

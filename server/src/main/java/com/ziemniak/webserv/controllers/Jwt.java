@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,8 +21,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RestController
 @Api(description = "JWT Authentication", value = "Allows creating and blacklisting JWT")
-public class JwtRest {
-	private final Logger log = LoggerFactory.getLogger(JwtRest.class);
+public class Jwt {
+	private final Logger log = LoggerFactory.getLogger(Jwt.class);
 	private static final int JWT_DURABILITY = 5 * 1000 * 60;//5min
 	@Autowired
 	private BlacklistedJwtRepository blackList;

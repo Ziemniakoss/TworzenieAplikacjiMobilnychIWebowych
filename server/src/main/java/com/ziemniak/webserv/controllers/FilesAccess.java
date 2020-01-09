@@ -26,13 +26,13 @@ import java.util.List;
 
 @RestController
 @Api(description = "Allows to access files stored on server")
-public class FilesREST {
+public class FilesAccess {
 	@Autowired
 	private JwtUtils jwtUtils;
 	@Autowired
 	private FileRepository fileRepository;
 
-	private final Logger log = LoggerFactory.getLogger(FilesREST.class);
+	private final Logger log = LoggerFactory.getLogger(FilesAccess.class);
 
 	@PostMapping(value = "/files/add", produces = "application/json")
 	@ApiOperation(value = "Creates new file in database")
