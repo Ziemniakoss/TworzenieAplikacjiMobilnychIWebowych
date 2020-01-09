@@ -17,7 +17,7 @@ public class SwaggerConf {
 
 	@Bean
 	public Docket swaggerConfiguration() {
-		return new Docket(DocumentationType.SWAGGER_2).
+		return new Docket(DocumentationType.SWAGGER_2).useDefaultResponseMessages(false).
 				select()
 				.apis(RequestHandlerSelectors.basePackage("com.ziemniak.webserv"))
 				.build()

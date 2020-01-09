@@ -47,7 +47,7 @@ public class RegisterREST {
 					response = RegisterResponseDTO.class)
 	})
 	@ApiOperation(value = "Tworzy nowego użytkownika w bazie danych", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request) throws PasswordValidationException, UserAlreadyExistsException {
+	public ResponseEntity<RegisterResponseDTO> register(@RequestBody RegisterRequestDTO request) throws PasswordValidationException, UserAlreadyExistsException {
 		boolean accepted = false;
 		List<String> errors = new ArrayList<>();
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();//todo wrzucenie jako beana
@@ -72,7 +72,7 @@ public class RegisterREST {
 		body.setErrors(errors);
 		body.setUsername(request.getUsername());
 		if (accepted)
-			return new ResponseEntity<RegisterResponseDTO>(body, HttpStatus.OK);
+			return new ResponseEntity<>(body, HttpStatus.OK);
 		else
 			return new ResponseEntity(body, HttpStatus.BAD_REQUEST);
 	}

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Pozwala na wytwarzanie JWT
  */
@@ -31,13 +33,11 @@ public class JwtRest {
 
 	@PostMapping(value = "/auth/logout", produces = "application/json", consumes = "application/json")
 	@ApiOperation(value = "Blacklist JWT", produces = "application/json", consumes = "application/json")
-	@ApiResponse(code = 200, message = "Successfully blaclisted jwt", response = BlacklistJwtResponseDTO.class)
-	public ResponseEntity blacklistJwt(@RequestBody BlacklistJwtRequestDTO req) {
-		if (jwtUtils.verify(req.getJwt())) {
-			blackList.add(req.getJwt());
-		}
-		log.info("JWT was blacklisted(" + req.getJwt() + ")");
-		return new ResponseEntity<>(new BlacklistJwtResponseDTO(req.getJwt(), true), HttpStatus.OK);
+	@ApiResponse(code = 200, message = "Successfully blaclisted jwt")
+	public ResponseEntity blacklistJwt(HttpServletRequest req) {
+		String jwt = req.getHeader("Authorization").substring(7);
+		blackList.blacklist(jwt);
+		return new ResponseEntity<>(new BlacklistJwtResponseDTO(jwt, true), HttpStatus.OK);
 	}
 }
 

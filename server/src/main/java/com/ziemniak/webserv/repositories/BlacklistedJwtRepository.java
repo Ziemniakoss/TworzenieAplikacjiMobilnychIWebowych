@@ -2,26 +2,32 @@ package com.ziemniak.webserv.repositories;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import redis.clients.jedis.Jedis;
 
 @Repository
 public class BlacklistedJwtRepository {
 	private final Logger log = LoggerFactory.getLogger(BlacklistedJwtRepository.class);
-	private final String prefix = "blackList";
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
-	public void add(String jwt) {
-		log.debug("Adding new jwt to blacklist");
-		Jedis j = new Jedis();
-		j.set(prefix + jwt, "");
-		j.close();
+	public void blacklist(String jwt) {
+		if (jwt == null) {
+			return;
+		}
+		try {
+			jdbcTemplate.update("INSERT INTO blacklisted_jwt (jwt) VALUES (?);", jwt);
+			log.info(String.format("Blacklisted jwt (%s)", jwt));
+		}catch (DataAccessException e){
+			//prawdopodobnie jwt jest juz zbanowany
+			log.error(String.format("Error(%s) occured while blaklisting jwt(%s): %s",e.getClass(),jwt,e.getMessage()));
+		}
 	}
 
-	public boolean isBlacklisted(String jwt){
-		log.debug("checking if jwt is blacklisted");
-		Jedis j = new Jedis();
-		boolean result = j.exists(prefix+jwt);
-		j.close();
-		return result;
+	public boolean isBlacklisted(String jwt) {
+		return jdbcTemplate.queryForObject(
+				"SELECT EXISTS(SELECT NULL FROM blacklisted_jwt WHERE jwt = ?);", Boolean.class, jwt);
 	}
 }

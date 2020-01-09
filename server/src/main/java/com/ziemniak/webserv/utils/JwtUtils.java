@@ -90,7 +90,7 @@ public class JwtUtils {
 	}
 
 	public void addToBlacklist(String jwt) {
-		blackList.add(jwt);
+		blackList.blacklist(jwt);
 	}
 
 }

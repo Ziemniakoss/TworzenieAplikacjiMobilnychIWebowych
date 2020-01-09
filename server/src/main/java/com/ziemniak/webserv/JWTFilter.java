@@ -1,5 +1,6 @@
 package com.ziemniak.webserv;
 
+import com.ziemniak.webserv.repositories.BlacklistedJwtRepository;
 import com.ziemniak.webserv.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,23 +17,28 @@ import java.io.IOException;
 
 @Component
 public class JWTFilter extends OncePerRequestFilter {
-    @Autowired
-    private MyUserDetailsService userDetailsService;
-    @Autowired
-private     JwtUtils jwtUtils;
-    @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
-        //TODO
-        final String authHeader = req.getHeader("Authorization");
-        String username = null;
-        String jwt = null;
-        if(authHeader != null){
-            jwt = authHeader.substring(7);
-            username = jwtUtils.getUsername(jwt);
-            UserDetails user = userDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null,user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(token);
-        }
-        filterChain.doFilter(req,res);
-    }
+	@Autowired
+	private MyUserDetailsService userDetailsService;
+	@Autowired
+	private JwtUtils jwtUtils;
+	@Autowired
+	private BlacklistedJwtRepository blacklistedJwtRepository;
+
+	@Override
+	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
+		//TODO
+		final String authHeader = req.getHeader("Authorization");
+		String username = null;
+		String jwt = null;
+		if (authHeader != null) {
+			jwt = authHeader.substring(7);
+			if (!blacklistedJwtRepository.isBlacklisted(jwt)) {
+				username = jwtUtils.getUsername(jwt);
+				UserDetails user = userDetailsService.loadUserByUsername(username);
+				UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+				SecurityContextHolder.getContext().setAuthentication(token);
+			}
+		}
+		filterChain.doFilter(req, res);
+	}
 }
