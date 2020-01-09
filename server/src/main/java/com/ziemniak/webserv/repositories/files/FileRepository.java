@@ -101,7 +101,7 @@ public class FileRepository {
 		return jdbcTemplate.queryForObject("SELECT file FROM files WHERE id = ?", (rs, rw) -> rs.getBytes("file"), id);
 	}
 
-	private boolean exists(int fileId) {
+	public boolean exists(int fileId) {
 		return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT id FROM files WHERE id = ?)",
 				(rs, rw) -> rs.getBoolean(1), fileId);
 	}
