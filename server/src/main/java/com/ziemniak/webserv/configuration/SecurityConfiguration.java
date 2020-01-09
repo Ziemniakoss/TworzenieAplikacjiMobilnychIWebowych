@@ -39,6 +39,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/auth/login").permitAll()
 				.antMatchers("/auth/register").permitAll()
 				.antMatchers("/").permitAll()
+				.antMatchers("/tea").permitAll()
+				.antMatchers("/coffee").permitAll()
 				.antMatchers("/swagger-ui.html").permitAll()
 				.antMatchers("/check/**").permitAll()
 				.antMatchers("/webjars/springfox-swagger-ui/**").permitAll()
