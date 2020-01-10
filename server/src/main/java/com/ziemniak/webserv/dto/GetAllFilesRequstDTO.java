@@ -1,17 +1,17 @@
 package com.ziemniak.webserv.dto;
 
-import com.ziemniak.webserv.filestorage.File;
+import com.ziemniak.webserv.repositories.files.FileInfo;
 
 import java.util.List;
 
 public class GetAllFilesRequstDTO {
-	private List<File> files;
+	private List<FileInfo> fileInfos;
 
-	public List<File> getFiles() {
-		return files;
+	public List<FileInfo> getFileInfos() {
+		return fileInfos;
 	}
 
-	public void setFiles(List<File> files) {
-		this.files = files;
+	public void setFileInfos(List<FileInfo> fileInfos) {
+		this.fileInfos = fileInfos;
 	}
 }

@@ -25,13 +25,13 @@ public class UserRepository {
 	private PasswordUtils passwordUtils;
 
 	public void add(String username, String passwordPlain) throws PasswordValidationException, UserAlreadyExistsException {
-		if(userExists(username)){
+		if (userExists(username)) {
 			throw new UserAlreadyExistsException();
 		}
 		passwordUtils.validate(passwordPlain);
 		String hash = passwordEncoder.encode(passwordPlain);
 		String sql = "INSERT INTO users (username, password_hash) VALUES (?,?);";
-		jdbcTemplate.update(sql,username,hash);
+		jdbcTemplate.update(sql, username, hash);
 	}
 
 	public void changePassword(User u, String passwordPlain) throws PasswordValidationException, UserDoesNotExistException {
@@ -40,7 +40,8 @@ public class UserRepository {
 
 	}
 
-	public User getUser(String username) throws UsernameNotFoundException{
+	public User getUser(String username) throws UsernameNotFoundException {
+		//todo refactor
 		if (!userExists(username)) {
 			throw new UsernameNotFoundException(username);
 		}
@@ -51,6 +52,22 @@ public class UserRepository {
 
 	public boolean userExists(String username) {
 		return jdbcTemplate.queryForObject("SELECT EXISTS(SELECT id FROM users WHERE username = ?)", Boolean.class, username);
+	}
+
+	/**
+	 * znajduje id użytkownika w bazie danych
+	 *
+	 * @param username nazwa użytkownika
+	 * @return id użytkownika
+	 * @throws UsernameNotFoundException jak nie ma takiego użytkownika
+	 */
+	public int getUserId(String username) {
+		Integer id = jdbcTemplate.queryForObject(
+				"SELECT id FROM users WHERE username = ?;", Integer.class, username);
+		if (id == null) {
+			throw new UsernameNotFoundException(username);
+		}
+		return id;
 	}
 
 }

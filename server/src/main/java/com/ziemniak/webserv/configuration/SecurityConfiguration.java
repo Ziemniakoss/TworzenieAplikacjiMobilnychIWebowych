@@ -39,6 +39,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/auth/login").permitAll()
 				.antMatchers("/auth/register").permitAll()
 				.antMatchers("/").permitAll()
+				.antMatchers("/tea").permitAll()
+				.antMatchers("/coffee").permitAll()
 				.antMatchers("/swagger-ui.html").permitAll()
 				.antMatchers("/check/**").permitAll()
 				.antMatchers("/webjars/springfox-swagger-ui/**").permitAll()
@@ -52,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) {
 		web.ignoring().antMatchers("/v2/api-docs",
-				"/configuration/ui",
+	//			"/configuration/ui",
 				"/swagger-resources/**",
 //				"/configuration/security",
 				"/swagger-ui.html",
@@ -61,7 +63,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder(15);
+		return new BCryptPasswordEncoder(12);
 	}
 
 	@Autowired

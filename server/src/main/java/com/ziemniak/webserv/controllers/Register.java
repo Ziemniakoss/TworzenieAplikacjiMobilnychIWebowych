@@ -2,7 +2,6 @@ package com.ziemniak.webserv.controllers;
 
 import com.ziemniak.webserv.dto.RegisterRequestDTO;
 import com.ziemniak.webserv.dto.RegisterResponseDTO;
-import com.ziemniak.webserv.filestorage.StorageService;
 import com.ziemniak.webserv.repositories.users.UserAlreadyExistsException;
 import com.ziemniak.webserv.repositories.users.UserRepository;
 import com.ziemniak.webserv.utils.PasswordValidationException;
@@ -32,12 +31,11 @@ import java.util.Set;
 @RequestMapping("/auth/register")
 @CrossOrigin()
 @Api(description = "Pozwala na rejstrowanie się")
-public class RegisterREST {
-	private final Logger log = LoggerFactory.getLogger(RegisterREST.class);
+public class Register {
+	private final Logger log = LoggerFactory.getLogger(Register.class);
 	@Autowired
 	private UserRepository userRepository;
-	@Autowired
-	private StorageService storageService;
+
 
 	@PostMapping(produces = "application/json", consumes = "application/json")
 	@CrossOrigin(origins = "*")
@@ -49,7 +47,7 @@ public class RegisterREST {
 					response = RegisterResponseDTO.class)
 	})
 	@ApiOperation(value = "Tworzy nowego użytkownika w bazie danych", produces = "application/json", consumes = "application/json")
-	public ResponseEntity<?> register(@RequestBody RegisterRequestDTO request) throws PasswordValidationException, UserAlreadyExistsException {
+	public ResponseEntity<RegisterResponseDTO> register(@RequestBody RegisterRequestDTO request) throws PasswordValidationException, UserAlreadyExistsException {
 		boolean accepted = false;
 		List<String> errors = new ArrayList<>();
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();//todo wrzucenie jako beana
@@ -60,7 +58,6 @@ public class RegisterREST {
 				userRepository.add(request.getUsername(),request.getPassword());//todo refactor
 				log.info("Added new user with username '" + request.getUsername() + "'");
 				accepted = true;
-				storageService.addUser(request.getUsername());
 			} else {
 				errors.add("User with username '" + request.getUsername() + "' already exists");
 			}
@@ -75,7 +72,7 @@ public class RegisterREST {
 		body.setErrors(errors);
 		body.setUsername(request.getUsername());
 		if (accepted)
-			return new ResponseEntity<RegisterResponseDTO>(body, HttpStatus.OK);
+			return new ResponseEntity<>(body, HttpStatus.OK);
 		else
 			return new ResponseEntity(body, HttpStatus.BAD_REQUEST);
 	}

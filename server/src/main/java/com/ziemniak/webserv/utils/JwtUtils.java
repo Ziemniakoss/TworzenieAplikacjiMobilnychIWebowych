@@ -1,4 +1,4 @@
-package com.ziemniak.webserv;
+package com.ziemniak.webserv.utils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -12,12 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Map;
 
 @Component
-public class TokenManager {
-	private final Logger log = LoggerFactory.getLogger(TokenManager.class);
+public class JwtUtils {
+	private final Logger log = LoggerFactory.getLogger(JwtUtils.class);
 	private String secret = "sekrecik";//Todo ukyć go
 
 	@Autowired
@@ -90,7 +91,11 @@ public class TokenManager {
 	}
 
 	public void addToBlacklist(String jwt) {
-		blackList.add(jwt);
+		blackList.blacklist(jwt);
+	}
+
+	public String extractUsername(HttpServletRequest request){
+		return getUsername(request.getHeader("Authorization").substring(7));
 	}
 
 }

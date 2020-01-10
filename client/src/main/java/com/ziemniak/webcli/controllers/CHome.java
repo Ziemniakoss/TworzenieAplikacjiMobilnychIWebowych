@@ -45,7 +45,7 @@ public class CHome {
 
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("Cookie", "jwt=" + jwt);
+		headers.set("Authorization", "Bearer " + jwt);
 
 
 
@@ -96,7 +96,7 @@ public class CHome {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-		headers.set("Cookie", "jwt=" + jwt);
+		headers.set("Authorization", "Bearer " + jwt);
 
 
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
