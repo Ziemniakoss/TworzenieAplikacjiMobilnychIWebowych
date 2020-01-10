@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Map;
 
@@ -91,6 +92,10 @@ public class JwtUtils {
 
 	public void addToBlacklist(String jwt) {
 		blackList.blacklist(jwt);
+	}
+
+	public String extractUsername(HttpServletRequest request){
+		return getUsername(request.getHeader("Authorization").substring(7));
 	}
 
 }

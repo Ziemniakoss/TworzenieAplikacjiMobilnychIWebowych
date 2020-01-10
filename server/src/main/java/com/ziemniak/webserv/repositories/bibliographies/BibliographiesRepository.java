@@ -2,7 +2,9 @@ package com.ziemniak.webserv.repositories.bibliographies;
 
 import com.ziemniak.webserv.repositories.files.FileDoesNotExistException;
 import com.ziemniak.webserv.repositories.files.FileRepository;
+import com.ziemniak.webserv.repositories.files.PermissionDeniedException;
 import com.ziemniak.webserv.repositories.users.UserRepository;
+import com.ziemniak.webserv.utils.JwtUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ public class BibliographiesRepository {
 	private UserRepository userRepository;
 	@Autowired
 	private FileRepository fileRepository;
+	@Autowired
+	private JwtUtils jwtUtils;
 
 	private final RowMapper<Bibliography> mapper =
 			(rs, rn) -> new Bibliography(rs.getInt("id"), rs.getString("name"));
@@ -59,9 +63,14 @@ public class BibliographiesRepository {
 				id, bibliographyName);
 	}
 
-	public void addFileToBibliography(int bibliographyId, int fileId) throws BibliographyDoesNotExistsException, FileDoesNotExistException {
+	public void addFileToBibliography(int bibliographyId, int fileId, String username)
+			throws BibliographyDoesNotExistsException, FileDoesNotExistException, PermissionDeniedException {
 		if (!fileRepository.exists(fileId)) {
 			throw new FileDoesNotExistException(fileId);
+		}
+
+		if (!fileRepository.hasAccess(fileId, username)) {
+			throw new PermissionDeniedException();
 		}
 		if (!exists(bibliographyId)) {
 			throw new BibliographyDoesNotExistsException(bibliographyId);
@@ -73,8 +82,13 @@ public class BibliographiesRepository {
 		} catch (DataAccessException d) {
 			//todo lepsze łapanie
 			//prawdopodobnie już jest taki rekord
-			log.error(String.format("Error(%s) occured while adding file %d to bibliography %d: %s"),
-					d.getClass(), fileId, bibliographyId, d.getMessage());
+			log.error(String.join("", "Error(",
+					d.getClass().toString(), ") occured while adding file ",
+					String.valueOf(fileId),
+					" to bibliography ",
+					String.valueOf(bibliographyId)),
+					d.getMessage());
+			d.printStackTrace();
 		}
 	}
 
@@ -112,18 +126,18 @@ public class BibliographiesRepository {
 	public Collection<Bibliography> getAll(String username) {
 		int id = userRepository.getUserId(username);
 		return jdbcTemplate.query(
-				"SELECT id, name FROM bibliographies WHERE owner = ?", new Object[]{}, mapper);
+				"SELECT id, name FROM bibliographies WHERE owner = ?", new Object[]{userRepository.getUserId(username)}, mapper);
 	}
 
 	public boolean hasAccess(int bibliographyId, String username) {
 		return jdbcTemplate.queryForObject(
-				"SELECT EXISTS(SELECT EXISTS(SELECT id FROM bibliographies WHERE id = ? AND owner = ?);",
+				"SELECT EXISTS(SELECT  id FROM bibliographies WHERE id = ? AND owner = ?);",
 				Boolean.class, bibliographyId, userRepository.getUserId(username));
 	}
 
 	public boolean exists(int bibliographyId) {
 		return jdbcTemplate.queryForObject(
-				"SELECT EXITS(SELECT id FROM bibliographies WHERE id = ?);",
+				"SELECT EXISTS(SELECT id FROM bibliographies WHERE id = ?);",
 				Boolean.class, bibliographyId);
 	}
 }
