@@ -1,6 +1,7 @@
 package com.ziemniak.webserv.repositories.files;
 
 import com.ziemniak.webserv.repositories.users.UserDoesNotExistException;
+import com.ziemniak.webserv.repositories.users.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ public class FileRepository {
 	private final Logger log = LoggerFactory.getLogger(FileRepository.class);
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	@Autowired
+	private UserRepository userRepository;
 
 	public boolean hasAccess(int fileId, String username) {
 		if (isOwner(fileId, username)) {
@@ -120,7 +123,12 @@ public class FileRepository {
 	}
 
 	public List<FileInfo> getAllSharedFilesInfo(String username){
-		//todo
-		return null;
+		int id = userRepository.getUserId(username);
+		String sql= "SELECT f.name as \"name\" f.id as \"id\" " +
+				" FROM shared_files sf " +
+				" JOIN files f on f.id = sf.file_id " +
+				" WHERE owner = ?";
+		return jdbcTemplate.query(sql, new Object[]{id},
+				(resultSet, i) -> new FileInfo(resultSet.getInt("id"),resultSet.getString("name")));
 	}
 }
