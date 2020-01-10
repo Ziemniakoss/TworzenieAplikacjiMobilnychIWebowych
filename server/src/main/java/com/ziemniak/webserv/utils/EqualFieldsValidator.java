@@ -24,8 +24,7 @@ public class EqualFieldsValidator implements ConstraintValidator<EqualFields, Ob
 				return v1.equals(v2);
 			else
 				return v2.equals(v1);
-		}catch (Exception e){
-			e.printStackTrace();//todo better handling
+		} catch (Exception e) {
 			return false;
 		}
 	}

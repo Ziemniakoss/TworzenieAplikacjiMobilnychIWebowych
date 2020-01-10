@@ -44,7 +44,7 @@ public class BibliographyFiles {
 		} catch (FileDoesNotExistException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Plik nie istnieje");
 		} catch (PermissionDeniedException e) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz uprawnień do pliku");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie jesteś właścicielem pliku");
 		}
 	}
 

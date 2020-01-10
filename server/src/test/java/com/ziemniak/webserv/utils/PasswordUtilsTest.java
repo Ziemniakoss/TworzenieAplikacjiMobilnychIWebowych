@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-//todo
 class PasswordUtilsTest {
 	@Autowired
 	PasswordUtils ps;
@@ -20,8 +19,8 @@ class PasswordUtilsTest {
 			"BarDz0MoCn3H@s10!",
 	})
 
-	void validateCorrectPasswords(String password) throws PasswordValidationException{
-		//todo
+	void validateCorrectPasswords(String password) {
+			assertDoesNotThrow(()->ps.validate(password));
 	}
 
 	@ParameterizedTest

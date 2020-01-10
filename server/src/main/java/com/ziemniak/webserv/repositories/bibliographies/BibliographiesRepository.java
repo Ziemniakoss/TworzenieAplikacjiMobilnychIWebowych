@@ -69,7 +69,7 @@ public class BibliographiesRepository {
 			throw new FileDoesNotExistException(fileId);
 		}
 
-		if (!fileRepository.hasAccess(fileId, username)) {
+		if (!fileRepository.isOwner(fileId, username)) {
 			throw new PermissionDeniedException();
 		}
 		if (!exists(bibliographyId)) {

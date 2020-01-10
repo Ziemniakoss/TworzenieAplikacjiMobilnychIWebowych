@@ -86,12 +86,8 @@ public class FileRepository {
 		if (username == null) {
 			return false;
 		}
-		//todo sprawdzic
-		String sql = "SELECT username FROM files f" +
-				" JOIN users u on u.id = fileId.owner " +
-				" WHERE f.id = ?;";
-		String owner = jdbcTemplate.queryForObject(sql, new Object[]{username}, (rs, rw) -> rs.getString("username"));
-		return username.equals(owner);
+		String sql = "SELECT ((SELECT owner_id FROM files WHERE id = ?) = (SELECT id FROM users WHERE username = ?))";
+		return jdbcTemplate.queryForObject(sql, new Object[]{fileId,username}, Boolean.class);
 	}
 
 	public byte[] getFile(int id) throws FileDoesNotExistException {
