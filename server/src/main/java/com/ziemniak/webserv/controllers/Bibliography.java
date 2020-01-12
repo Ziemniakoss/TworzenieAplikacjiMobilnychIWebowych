@@ -11,10 +11,12 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @Api(description = "Zarządzanie bibliografiami(ale nie ich plikami)")
@@ -29,7 +31,8 @@ public class Bibliography {
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Pobrano dane", response = com.ziemniak.webserv.repositories.bibliographies.Bibliography.class),
 			@ApiResponse(code = 404, message = "Bibliografia nie istnieje"),
-			@ApiResponse(code = 401, message = "Brak nagłówka autoryzacyjnego albo nie posiadasz uprawnień do tej bibliografii")
+			@ApiResponse(code = 401, message = "Nie posiadasz uprawnień do tej bibliografii"),
+			@ApiResponse(code = 403, message = "Brak naglówka autoryzującego")
 	})
 	public ResponseEntity<?> getBibliographyInfo(@PathVariable int id, HttpServletRequest req) {
 		String username = jwtUtils.getUsername(req.getHeader("Authorization").substring(7));
@@ -44,29 +47,52 @@ public class Bibliography {
 	}
 
 	@GetMapping("/bibliography/getall")
-	public ResponseEntity<Collection<com.ziemniak.webserv.repositories.bibliographies.Bibliography>> getAllBibliographies(HttpServletRequest req) {
+	@ApiOperation(value = "Pobiera wszystkie bibliografie należące do użytkownika")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Udało sie pobrać"),//todo response
+			@ApiResponse(code = 403, message = "Brak naglówka autoryzującego"),
+			@ApiResponse(code = 404, message = "Użytkownik nie istnieje")}
+	)
+	public ResponseEntity<?> getAllBibliographies(HttpServletRequest req) {
 		String username = jwtUtils.getUsername(req.getHeader("Authorization").substring(7));
-		return ResponseEntity.status(HttpStatus.OK).body(bibliographiesRepository.getAll(username));
+		Collection<com.ziemniak.webserv.repositories.bibliographies.Bibliography> all = null;
+		try {
+			all = bibliographiesRepository.getAll(username);
+			return ResponseEntity.status(HttpStatus.OK).body(all);
+		} catch (UsernameNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik nie istnieje");
+		}
+
 	}
 
 	@PostMapping("/bibliography/add")
-	public void createBibliography(@RequestBody BibliographyCreationRequestDTO creationReq, HttpServletRequest req) {
+	@ApiOperation(value = "Tworzy nową bibliografię")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Udało się dodać bibliografię"),
+			@ApiResponse(code = 404, message = "Nie ma takiego uytkownika"),
+			@ApiResponse(code = 403, message = "Brak naglówka autoryzującego")
+	})
+	public ResponseEntity<?> createBibliography(@RequestBody BibliographyCreationRequestDTO creationReq, HttpServletRequest req) {
 		String username = jwtUtils.getUsername(req.getHeader("Authorization").substring(7));
-		bibliographiesRepository.create(username, creationReq.getName());
+		try {
+			bibliographiesRepository.create(username, creationReq.getName());
+			return ResponseEntity.ok("Dodano");
+		} catch (UsernameNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik nie istnieje");
+		}
 	}
 
 	@DeleteMapping("/bibliography/{id}")
 	@ApiOperation(value = "Usuwa bibliografię o podanym id")
 	@ApiResponses({
-			@ApiResponse(code = 200,message = "Udało się usunąć bibliografię"),
-			@ApiResponse(code = 404, message = "Bibliografia nie istnieje"),
-			@ApiResponse(code = 401,
-					message = "W żądaniu nie było poprawnego nagłówka autoryzującego zawierającego " +
-							"jwt albo użytkownik nie ma uprawnień do bibliografii")
+			@ApiResponse(code = 200, message = "Udało się usunąć bibliografię"),
+			@ApiResponse(code = 401, message = "Użytkownik nie ma uprawnień do bibliografii"),
+			@ApiResponse(code = 403, message = "Brak naglówka autoryzującego"),
+			@ApiResponse(code = 404, message = "Bibliografia nie istnieje")
 	})
-	public ResponseEntity deleteBibliography(@PathVariable int id, HttpServletRequest req){
+	public ResponseEntity deleteBibliography(@PathVariable int id, HttpServletRequest req) {
 		String username = jwtUtils.getUsername(req.getHeader("Authorization").substring(7));
-		if(!bibliographiesRepository.hasAccess(id,username)){
+		if (!bibliographiesRepository.hasAccess(id, username)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 		try {

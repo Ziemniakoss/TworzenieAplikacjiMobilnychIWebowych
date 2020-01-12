@@ -1,6 +1,7 @@
 package com.ziemniak.webserv.repositories.bibliographies;
 
 import com.ziemniak.webserv.repositories.files.FileDoesNotExistException;
+import com.ziemniak.webserv.repositories.files.FileInfo;
 import com.ziemniak.webserv.repositories.files.FileRepository;
 import com.ziemniak.webserv.repositories.files.PermissionDeniedException;
 import com.ziemniak.webserv.repositories.users.UserRepository;
@@ -139,5 +140,14 @@ public class BibliographiesRepository {
 		return jdbcTemplate.queryForObject(
 				"SELECT EXISTS(SELECT id FROM bibliographies WHERE id = ?);",
 				Boolean.class, bibliographyId);
+	}
+
+	public Collection<FileInfo> getAllFiles(int bibliographyId){
+		String sql = "SELECT id,name,creation_date " +
+				" FROM bibliography_files " +
+				" JOIN files f ON bibliography_files.file_id = f.id " +
+				" WHERE bibliography_id = ?;";
+		return jdbcTemplate.query(sql,new Object[]{bibliographyId},
+				(rs, rn)-> new FileInfo(rs.getInt("id"),rs.getString("name")));
 	}
 }

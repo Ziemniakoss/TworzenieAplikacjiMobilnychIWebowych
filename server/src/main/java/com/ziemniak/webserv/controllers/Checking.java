@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Allows to chceck if given nick is available and how strong password is
- */
 @RestController()
 @Api(description = "Umożliwia na sprwadzanie dostępności haseł i nicków")
 public class Checking {
@@ -25,9 +22,6 @@ public class Checking {
 	@Autowired
 	private PasswordUtils passwordUtils;
 
-	/**
-	 * Check if given username is available
-	 */
 	@GetMapping("/check/username/{username}")
 	@CrossOrigin()
 	@ApiOperation(value = "Sprawdza czy dana nazwa użytkownika jest poprawna", response = UserNameCheckDTO.class)
