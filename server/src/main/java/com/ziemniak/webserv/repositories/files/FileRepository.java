@@ -108,7 +108,7 @@ public class FileRepository {
 	}
 
 	public List<FileInfo> getAllOwnedFilesInfo(String username) throws UserDoesNotExistException {
-		boolean userExists = jdbcTemplate.queryForObject("SELECT EXISTS(SELCT id FROM users WHERE username = ?)", new Object[]{username}, Boolean.class);
+		boolean userExists = jdbcTemplate.queryForObject("SELECT EXISTS(SELECT id FROM users WHERE username = ?)", new Object[]{username}, Boolean.class);
 		if (!userExists) {
 			throw new UserDoesNotExistException();
 		}

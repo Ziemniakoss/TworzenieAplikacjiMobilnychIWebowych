@@ -83,7 +83,7 @@ public class FilesAccess {
 			@ApiResponse(code = 200, message = "User was authorized and server returned all user's files info"),
 			@ApiResponse(code = 401, message = "jwt cookie contained invalid JWT")
 	})
-	private ResponseEntity getAll(String jwt, HttpServletRequest httpServletRequest) {
+	private ResponseEntity getAll(HttpServletRequest httpServletRequest) {
 		String username = jwtUtils.extractUsername(httpServletRequest);
 		List<FileInfo> fileInfos = null;
 		try {

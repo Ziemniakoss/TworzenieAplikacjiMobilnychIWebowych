@@ -19,7 +19,7 @@ object UserDetails {
 	val listeners: MutableCollection<LoginResponseListener> = mutableListOf()
 	fun addListener(listener: LoginResponseListener) = listeners.add(listener)
 
-	fun updateJwt() {
+	fun updateJwt(): Call? {
 		var body = RequestBody.create(
 			MediaType.parse("application/json; charset=utf-8"), Gson().toJson(Credentials(username, password))
 		)
@@ -27,16 +27,17 @@ object UserDetails {
 
 
 		var request = Request.Builder().url(Variables.urlToServer + "auth/login").post(body).build()
-		try {
-			var response = OkHttpClient().newCall(request).enqueue(FetchingJwtCallback())
-		} catch (e: Exception) {
-			e.printStackTrace()
-		}
+
+		val call = OkHttpClient().newCall(request)
+		call.enqueue(FetchingJwtCallback())
+		return call
 	}
-
-	class Credentials(var username: String?, var password: String?)
-
 }
+
+/**
+ * Na potrzeby jsonowania heheheh dajcie mi spac
+ */
+class Credentials(val username: String?, val password: String?)
 
 class FetchingJwtCallback : Callback {
 	override fun onFailure(call: Call, e: IOException) {
