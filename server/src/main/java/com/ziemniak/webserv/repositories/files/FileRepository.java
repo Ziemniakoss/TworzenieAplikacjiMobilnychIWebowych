@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,10 +49,11 @@ public class FileRepository {
 		if (!isOwner(fileId, owner)) {
 			throw new PermissionDeniedException();
 		}
-		if (owner.equals(user)) {
+		if (hasAccess(fileId, user)) {
 			return;//Już ma uprawnienia
 		}
-		//todo
+		int userId = userRepository.getUserId(user);
+		jdbcTemplate.update("INSERT INTO shared_files (file_id, user_id) VALUES (?,?);",fileId,userId);
 	}
 
 	public void saveFile(String owner, MultipartFile file) {
@@ -90,7 +92,7 @@ public class FileRepository {
 			return false;
 		}
 		String sql = "SELECT ((SELECT owner_id FROM files WHERE id = ?) = (SELECT id FROM users WHERE username = ?))";
-		return jdbcTemplate.queryForObject(sql, new Object[]{fileId,username}, Boolean.class);
+		return jdbcTemplate.queryForObject(sql, new Object[]{fileId, username}, Boolean.class);
 	}
 
 	public byte[] getFile(int id) throws FileDoesNotExistException {
@@ -122,13 +124,13 @@ public class FileRepository {
 				});
 	}
 
-	public List<FileInfo> getAllSharedFilesInfo(String username){
+	public List<FileInfo> getAllSharedFilesInfo(String username) {
 		int id = userRepository.getUserId(username);
-		String sql= "SELECT f.name as \"name\" f.id as \"id\" " +
+		String sql = "SELECT f.name as \"name\" f.id as \"id\" " +
 				" FROM shared_files sf " +
 				" JOIN files f on f.id = sf.file_id " +
 				" WHERE owner = ?";
 		return jdbcTemplate.query(sql, new Object[]{id},
-				(resultSet, i) -> new FileInfo(resultSet.getInt("id"),resultSet.getString("name")));
+				(resultSet, i) -> new FileInfo(resultSet.getInt("id"), resultSet.getString("name")));
 	}
 }
