@@ -114,7 +114,7 @@ public class FileRepository {
 		}
 		return jdbcTemplate.query("SELECT id, name, creation_date " +
 						"FROM files " +
-						"WHERE owner_id = (SELECT id FROM users WHERE username = ?)", new Object[]{username},
+						"WHERE files.owner = (SELECT id FROM users WHERE username = ?)", new Object[]{username},
 				(resultSet, i) -> {
 					FileInfo file = new FileInfo();
 					file.setId(resultSet.getInt("id"));
