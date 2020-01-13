@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:tools="http://schemas.android.com/tools"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		android:stretchColumns="*"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		tools:context="com.ziemniak.bibliomobile.CreateBibliographyActivity">
+
+	<TableRow
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+		<TextView
+				android:text="Stwórz nową bibliografię"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" android:id="@+id/textView8" android:textSize="24sp"
+				android:textAlignment="center"
+		android:layout_span="2"/>
+	</TableRow>
+	<TableRow
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+		<TextView
+				android:text="Nazwa"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:id="@+id/textView7"/>
+		<EditText
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:inputType="textPersonName"
+				android:ems="10"
+				android:id="@+id/editText2" android:hint="nazwa"/>
+	</TableRow>
+	<TableRow
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+		<Button
+				android:text="Utwórz"
+				android:layout_span="2"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" android:id="@+id/btnCreate"/>
+	</TableRow>
+</TableLayout>

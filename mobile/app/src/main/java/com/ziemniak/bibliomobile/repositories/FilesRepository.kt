@@ -27,7 +27,7 @@ object FilesRepository {
 			.addHeader("Content-Type", "application/json").build()
 		Log.i("AAAA", "Sending async call for all files")
 		OkHttpClient().newCall(request).enqueue(GetAllFilesCallback())
-		Log.i("AAAA","Bearer ${Variables.jwt}")
+		Log.i("AAAA", "Bearer ${Variables.jwt}")
 
 	}
 
@@ -42,15 +42,15 @@ object FilesRepository {
 				val jsonArray = JSONArray(response.body()?.string())
 				val filesArray = mutableListOf<File>()
 
-				for (i in 0 until jsonArray.length() - 1) {
+				for (i in 0 until jsonArray.length()) {
 					val json = jsonArray.getJSONObject(i)
 					filesArray.add(File(json["id"] as Int, json["name"] as String))
 				}
 				for (listener in listeners) {
 					listener.filesFetched(filesArray)
 				}
-			} else{
-				Log.e("AAAA","Unknown error occured(${response.code()}): ${response.body()?.string()}")
+			} else {
+				Log.e("AAAA", "Unknown error occured(${response.code()}): ${response.body()?.string()}")
 			}
 		}
 	}
