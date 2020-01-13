@@ -33,7 +33,7 @@ public class CHomeFileFetcher {
 		String url = ClientApplication.URL_TO_SERVER + "/files/get/" + id;
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("Cookie", "jwt=" + jwt);
+		headers.set("Authorization", "Bearer " + jwt);
 
 		HttpEntity httpEntity = new HttpEntity("", headers);
 		Resource res = rt.exchange(url, HttpMethod.GET, httpEntity, Resource.class).getBody();

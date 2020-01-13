@@ -34,6 +34,8 @@ public class CHome {
 
 	@GetMapping(value = "/home/fetchfile/{id}", produces = "multipart/mixed")
 	public String fetchFile(@CookieValue(value = "jwt", defaultValue = "") String jwt, @PathVariable(value = "id") String id, HttpServletResponse resp, @RequestHeader String host) throws IOException {
+		resp.sendRedirect(ClientApplication.URL_TO_SERVER+"/files/"+id);
+
 		System.out.println(host);
 		if ("".equals(jwt)) {
 			log.warn("Rejected file fetch request du to lack of JWT");
@@ -174,7 +176,7 @@ public class CHome {
 	private File[] fetchFileList(String jwt) throws HttpClientErrorException, HttpServerErrorException {
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("Cookie", "jwt=" + jwt);
+		headers.set("Authorization", "Bearer " + jwt);
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity entity = new HttpEntity<>("", headers);
 		String url = ClientApplication.URL_TO_SERVER + "/files/getall";
