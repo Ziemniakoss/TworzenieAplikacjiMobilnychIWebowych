@@ -5,13 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.ziemniak.bibliomobile.repositories.LoginResponseListener
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_login.*
 
-class MainActivity : AppCompatActivity(), LoginResponseListener {
+class LoginActivity : AppCompatActivity(), LoginResponseListener {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_main)
+		setContentView(R.layout.activity_login)
 		UserDetails.addListener(this)
 		btnRegister.setOnClickListener {
 			val intent = Intent(this, RegisterActivity::class.java)
