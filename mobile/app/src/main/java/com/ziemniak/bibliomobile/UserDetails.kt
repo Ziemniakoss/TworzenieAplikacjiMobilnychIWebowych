@@ -15,22 +15,53 @@ import java.lang.Exception
 object UserDetails {
 	var username: String? = null
 	var password: String? = null
+
 	var jwt: String? = null
 	val listeners: MutableCollection<LoginResponseListener> = mutableListOf()
 	fun addListener(listener: LoginResponseListener) = listeners.add(listener)
 
+	fun hek(jwtNew: String) {
+		jwt = jwtNew
+	}
+
 	fun updateJwt(): Call? {
-		var body = RequestBody.create(
-			MediaType.parse("application/json; charset=utf-8"), Gson().toJson(Credentials(username, password))
+		val credentials = Credentials(username, password)
+		Log.i("AAAA", "Kurwa no ${credentials.password} ${credentials.username}")
+
+
+		Log.i("AAAA", "Czy ti ti" + Gson().toJson(credentials))
+
+		val body = RequestBody.create(
+			MediaType.parse("application/json; charset=utf-8"), Gson().toJson(credentials)
 		)
-		Log.i("AAAA", Gson().toJson(Credentials(username, password)))
-
-
 		var request = Request.Builder().url(Variables.urlToServer + "auth/login").post(body).build()
-
 		val call = OkHttpClient().newCall(request)
 		call.enqueue(FetchingJwtCallback())
 		return call
+	}
+
+	class FetchingJwtCallback : Callback {
+		override fun onFailure(call: Call, e: IOException) {
+			Log.e("AAAA", "IOException while fetching jwt: ${e.message}")
+		}
+
+		override fun onResponse(call: Call, response: Response) {
+			if (response.isSuccessful) {
+				val hek:String = JSONObject(response.body()?.string())["jwt"] as String
+				Log.i("AAAA","Mamy hek = $hek")
+				synchronized(this) {
+					jwt = hek
+					println("Już $jwt")
+				}
+
+				Log.i("AAAA", "Jwt recived $jwt")
+			} else {
+				Log.e("AAAA", "Error while fetching jwt: ${response.body()?.string()}")
+			}
+			for (listener in UserDetails.listeners) {
+				listener.onAction(response.isSuccessful, jwt)
+			}
+		}
 	}
 }
 
@@ -38,22 +69,3 @@ object UserDetails {
  * Na potrzeby jsonowania heheheh dajcie mi spac
  */
 class Credentials(val username: String?, val password: String?)
-
-class FetchingJwtCallback : Callback {
-	override fun onFailure(call: Call, e: IOException) {
-		Log.e("AAAA", "IOException while fetching jwt: ${e.message}")
-	}
-
-	override fun onResponse(call: Call, response: Response) {
-		if (response.isSuccessful) {
-			UserDetails.jwt = JSONObject(response.body()?.string())["jwt"] as String?
-			Log.i("AAAA", "Jwt recived ${UserDetails.jwt}")
-		} else {
-			Log.e("AAAA", "Error while fetching jwt: ${response.body()?.string()}")
-		}
-		for (listener in UserDetails.listeners) {
-			listener.onAction(response.isSuccessful)
-		}
-	}
-
-}

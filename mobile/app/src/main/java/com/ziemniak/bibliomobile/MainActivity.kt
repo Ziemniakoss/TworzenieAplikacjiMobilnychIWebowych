@@ -22,15 +22,17 @@ class MainActivity : AppCompatActivity(), LoginResponseListener {
 			val password = txtvPassword.text.toString()
 			UserDetails.password = password
 			UserDetails.username = login
-			UserDetails.updateJwt()//async
+			UserDetails.updateJwt()
 		}
 	}
 
-	override fun onAction(accepted: Boolean) {
+	override fun onAction(accepted: Boolean, jwt:String?) {
 		runOnUiThread {
 			if (accepted) {
 				val intent = Intent(this, MainMenuActivity::class.java)
 				startActivity(intent)
+				Variables.jwt = jwt
+
 			} else {
 				Toast.makeText(this, "Dane są niepoprawne", Toast.LENGTH_SHORT).show()
 				txtvPassword.text.clear()

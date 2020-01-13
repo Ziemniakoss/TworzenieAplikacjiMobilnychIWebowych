@@ -58,7 +58,7 @@ public class FileRepository {
 
 	public void saveFile(String owner, MultipartFile file) {
 		String sql = "\n" +
-				"INSERT INTO files (owner_id, name, file) VALUES " +
+				"INSERT INTO files (owner, name, file) VALUES " +
 				"((SELECT id FROM users WHERE username = ?), ?, ?)";
 		PreparedStatementCreator creator = new PreparedStatementCreator() {
 			@Override

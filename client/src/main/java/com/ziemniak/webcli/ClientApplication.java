@@ -5,12 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ClientApplication {
-	public static  String URL_TO_SERVER="http://biblioziem-server:42069";
+	public static  String URL_TO_SERVER="https://ziemback.herokuapp.com";
 
 	public static void main(String[] args) {
-		if(args.length > 0) {
-			URL_TO_SERVER = args[0];
-		}
+
 		SpringApplication.run(ClientApplication.class, args);
 	}
 }

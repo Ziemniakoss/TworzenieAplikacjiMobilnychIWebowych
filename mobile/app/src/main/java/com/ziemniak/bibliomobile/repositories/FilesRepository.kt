@@ -23,27 +23,34 @@ object FilesRepository {
 
 	fun getAllFiles() {
 		val request = Request.Builder().url("${Variables.urlToServer}files/getall")
-			.addHeader("Authorization", "Bearer ${Variables.jwt}").build()
+			.addHeader("Authorization", "Bearer ${Variables.jwt}")
+			.addHeader("Content-Type", "application/json").build()
+		Log.i("AAAA", "Sending async call for all files")
 		OkHttpClient().newCall(request).enqueue(GetAllFilesCallback())
+		Log.i("AAAA","Bearer ${Variables.jwt}")
+
 	}
 
 	class GetAllFilesCallback : Callback {
 		override fun onFailure(call: Call, e: IOException) {
-			Log.e("AAAA","Error while fetching all files: ${e.message}")
+			Log.e("AAAA", "Error while fetching all files: ${e.message}")
 		}
 
 		override fun onResponse(call: Call, response: Response) {
-			if(response.isSuccessful){
+			if (response.isSuccessful) {
+				Log.i("AAAA", "Fetching files was successfull")
 				val jsonArray = JSONArray(response.body()?.string())
-				val filesArray
-			}else if(response.code() == 503){
-				//Wygasł jwt, odnawiamy
-				Log.i("AAAA","Update of jwt required before fetching files")
-				val call = UserDetails.updateJwt() ?: return
-				while (!call.isExecuted){
-					Thread.yield()
+				val filesArray = mutableListOf<File>()
+
+				for (i in 0 until jsonArray.length() - 1) {
+					val json = jsonArray.getJSONObject(i)
+					filesArray.add(File(json["id"] as Int, json["name"] as String))
 				}
-				getAllFiles()
+				for (listener in listeners) {
+					listener.filesFetched(filesArray)
+				}
+			} else{
+				Log.e("AAAA","Unknown error occured(${response.code()}): ${response.body()?.string()}")
 			}
 		}
 	}
