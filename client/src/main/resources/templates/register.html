@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Zarejestruj się</title>
+	<link href="css/main.css" rel="stylesheet">
+</head>
+<header th:insert="header"></header>
+<body>
+<h1>Utwórz nowe konto</h1>
+<ul class="error" th:if="${errorList != null}">
+	<li class="error" th:each="error : ${errorList}" th:text="${error}">Error</li>
+</ul>
+
+<form id="register" method="post" th:object="${user}">
+	<table>
+		<tr>
+			<td>
+				<label for="username"> Nazwa użykownika </label>
+			</td>
+			<td>
+				<input type="text" id="username" name="username">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="password"> Hasło </label>
+			</td>
+			<td>
+				<input type="password" id="password" name="password"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="validatePassword"> Potwierdź hasło </label>
+			</td>
+			<td>
+				<input type="password" id="validatePassword" name="validatePassword">
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<input type="submit" value="Zarejstruj">
+			</td>
+		</tr>
+	</table>
+</form>
+
+
+</body>
+<footer th:insert="footer"></footer>
+</html>
