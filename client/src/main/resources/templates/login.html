@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl" xmlns="http://www.w3.org/1999/xhtml"
-	  xmlns:th="http://www.thymeleaf.org"><head>
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
 	<meta charset="UTF-8">
 	<title>Zaloguj się</title>
 	<link rel="stylesheet" th:href="@{/css/main.css}">
@@ -8,6 +9,11 @@
 <body>
 <header th:insert="header"></header>
 <main>
+	<div th:if="${errorsList != null}" class="error">
+		<ul class="error">
+			<li class="error" th:each="error : ${errorsList}" th:text="${error}"></li>
+		</ul>
+	</div>
 	<form id="login" method="post" th:object="${user}">
 		<table>
 			<tr>

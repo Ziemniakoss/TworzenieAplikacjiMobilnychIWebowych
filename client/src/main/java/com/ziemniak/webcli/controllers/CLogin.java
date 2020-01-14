@@ -1,9 +1,6 @@
 package com.ziemniak.webcli.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ziemniak.webcli.ClientApplication;
-import com.ziemniak.webcli.dto.LoginNegativeResponseDto;
 import com.ziemniak.webcli.dto.LoginPositiveResponseDto;
 import com.ziemniak.webcli.dto.LoginRequestDTO;
 import org.slf4j.Logger;
@@ -27,6 +24,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Kontroler odpowiedzialny za logowanie do systemu
@@ -46,7 +45,12 @@ public class CLogin {
 	@PostMapping
 	public String processLoginRequest(@Valid @ModelAttribute LoginRequestDTO loginReq, Errors errors, Model model, HttpServletResponse httpServletResponse) {
 		if (errors.hasErrors()) {
-			processErrors(errors);
+			List<String> e = new ArrayList<>();
+			for (ObjectError ee : errors.getAllErrors()) {
+				System.out.println(ee.getDefaultMessage());
+				e.add(ee.getDefaultMessage());
+			}
+			model.addAttribute("errorsList", e);
 			return "login";
 		}
 		try {
@@ -55,23 +59,12 @@ public class CLogin {
 			cookie.setHttpOnly(true);
 			cookie.setMaxAge(5 * 60);
 			httpServletResponse.addCookie(cookie);
-			return "redirect:/home";
+			return "redirect:/myfiles";
 		} catch (HttpClientErrorException e) {
 			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {//Złe dane logowania
-				LoginNegativeResponseDto resp;
-				try {
-					ObjectMapper mapper = new ObjectMapper();
-					resp = mapper.readValue(e.getResponseBodyAsString(), LoginNegativeResponseDto.class);
-					String sb = "Failed to log in with username \"" +
-							loginReq.getUsername() +
-							"\"(http 401):" +
-							resp.getReason();
-					model.addAttribute("errorreason", resp.getReason());
-					model.addAttribute("username", loginReq.getUsername());
-				} catch (JsonProcessingException ex) {
-					log.error("Error occurred while parsing negative response from server(" +
-							e.getStatusCode() + ")to login: " + ex.getMessage());
-				}
+				List<String> ee = new ArrayList<>();
+				ee.add("Złe dane logowania");
+				model.addAttribute("errorsList", ee);
 			}
 			return "login";
 		} catch (HttpServerErrorException e) {
@@ -80,15 +73,9 @@ public class CLogin {
 					"):" +
 					e.getMessage();
 			log.error(message);
-			model.addAttribute("errorreason", "Server experienced error, please try again");
 			return "login";
 		} catch (Exception e) {
-			String message = "Unknown error occurred while logging to server" +
-					e.getClass() +
-					": " +
-					e.getMessage();
-			log.error(message);
-			model.addAttribute("errorreason", "Unknown error occurred, please try again later");
+			log.error("Unknown error occurred while logging to server" + e.getClass() + ": " + e.getMessage());
 			return "login";
 		}
 	}
@@ -112,23 +99,5 @@ public class CLogin {
 		String jwt = resp.getJwt();
 		log.info("Recived jwt for user \"" + loginReq.getUsername() + "\"");
 		return jwt;
-	}
-
-	private void processErrors(Errors errors) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("Login request had ");
-		sb.append(errors.getErrorCount());
-		sb.append(" errors: ");
-		boolean first = true;
-		for (ObjectError e : errors.getAllErrors()) {
-			if (first) {
-				sb.append(e.toString());
-				first = false;
-			} else {
-				sb.append(", ");
-				sb.append(e.toString());
-			}
-		}
-		log.warn(sb.toString());
 	}
 }
