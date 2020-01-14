@@ -1,39 +1,5 @@
-body{
-	background-color: black;
-	color: white;
-}
-input{
-    background-color: black;
-    color: white;
-    padding: 5px 5px;
-    margin: 5px 5px;
-}
-
-header{
-    background-color: #000099;
-    color: #b3b3b3;
-}
-
-.error{
-    background-color: red;
-    color: black;
-    padding: 5px 5px;
-    margin: 5px 5px;
-}
-.contact{
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.file-table{
-	margin-left: auto;
-	margin-right: auto;
-	width: 100%;
-}
-
 footer{
 	position: fixed;
 	bottom: 0;
 	width: 100%;
-	background: blue;
 }

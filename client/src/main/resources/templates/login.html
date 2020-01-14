@@ -1,53 +1,39 @@
 <!DOCTYPE html>
 <html lang="pl" xmlns="http://www.w3.org/1999/xhtml"
-	  xmlns:th="http://www.thymeleaf.org"
->
-<head>
+	  xmlns:th="http://www.thymeleaf.org"><head>
 	<meta charset="UTF-8">
-	<title>Zaloguj sie</title>
-	<link href="../static/css/main.css" th:href="@{/css/main.css}" rel="stylesheet"/>
+	<title>Zaloguj się</title>
+	<link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 <body>
-<div th:insert="header">...</div>
+<header th:insert="header"></header>
 <main>
-	<div class="error" th:if="${errorreason != null}">
-		<p th:text="${errorreason}">...</p>
-	</div>
 	<form id="login" method="post" th:object="${user}">
-<!--		<div class="error" th:if="${#fields.hasErrors('*')}">-->
-<!--			<p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>-->
-<!--		</div>-->
 		<table>
 			<tr>
 				<td>
-					<label for="username">
-						Nazwa użytkownika
-					</label>
+					<label for="username">Nazwa użytkownika</label>
 				</td>
 				<td>
-					<input type="text" id="username" name="username">
+					<input type="text" id="username" name="username" maxlength="10">
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<label for="password">
-						Hasło
-					</label>
+					<label for="password">Hasło</label>
 				</td>
 				<td>
-					<input type="password" id="password" name="password"/>
+					<input id="password" type="password" name="password" maxlength="20">
 				</td>
 			</tr>
 			<tr>
-				<td colspan="3">
-					<input type="submit" value="Submit">
+				<td colspan="2">
+					<input type="submit" value="Zaloguj">
 				</td>
 			</tr>
 		</table>
 	</form>
 </main>
-<footer>
-	<div th:insert="footer">...</div>
-</footer>
+<footer th:insert="footer"></footer>
 </body>
 </html>
