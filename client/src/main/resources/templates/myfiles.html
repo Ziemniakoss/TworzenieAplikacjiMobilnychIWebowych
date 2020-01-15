@@ -38,7 +38,7 @@
 			</form>
 		</td>
 		<td>
-			<form th:action="@{'myfiles/share/'+${file.id}}" method="post">
+			<form th:action="${'/sharefile/'} + ${file.id}" method="get">
 				<input type="submit" value="Udostępnij">
 			</form>
 		</td>
