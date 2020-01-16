@@ -1,6 +1,6 @@
 package com.ziemniak.webcli.dto;
 
-public class ShareFileRequestDTO {
+public class RevokeAccessToFileDTO {
 	private int fileId;
 	private String username;
 
@@ -22,7 +22,7 @@ public class ShareFileRequestDTO {
 
 	@Override
 	public String toString() {
-		return "ShareFileRequestDTO{" +
+		return "RevokeAccessToFileDTO{" +
 				"fileId=" + fileId +
 				", username='" + username + '\'' +
 				'}';

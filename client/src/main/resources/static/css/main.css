@@ -46,3 +46,10 @@ li.error{
 	background-color: darkred;
 	color: #111111;
 }
+
+td.shared-files-name{
+	vertical-align: top;
+}
+table.shared-files{
+	border: 1px solid #111111;
+}

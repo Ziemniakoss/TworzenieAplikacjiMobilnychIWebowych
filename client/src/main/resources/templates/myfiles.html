@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl" xmlns="http://www.w3.org/1999/xhtml"
-	  xmlns:th="http://www.thymeleaf.org"><head>
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
 	<meta charset="UTF-8">
 	<title>Moje pliki</title>
 	<link href="css/main.css" rel="stylesheet">
@@ -34,9 +35,9 @@
 		<td th:text="${file.extension}"></td>
 		<td>
 			<a th:href="@{'/myfiles/download/' + ${file.id}}" target="_blank">Pobierz?</a>
-<!--			<form th:action="@{'/myfiles/download/' + ${file.id}}" method="get">-->
-<!--				<input type="submit" value="Pobierz">-->
-<!--			</form>-->
+			<!--			<form th:action="@{'/myfiles/download/' + ${file.id}}" method="get">-->
+			<!--				<input type="submit" value="Pobierz">-->
+			<!--			</form>-->
 		</td>
 		<td>
 			<form th:action="${'/sharefile/'} + ${file.id}" method="get">
