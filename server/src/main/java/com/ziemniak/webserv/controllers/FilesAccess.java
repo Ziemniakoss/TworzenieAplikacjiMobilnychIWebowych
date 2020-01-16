@@ -1,5 +1,6 @@
 package com.ziemniak.webserv.controllers;
 
+import com.ziemniak.webserv.dto.FileSharedByUserDTO;
 import com.ziemniak.webserv.repositories.files.FileDoesNotExistException;
 import com.ziemniak.webserv.repositories.files.FileInfo;
 import com.ziemniak.webserv.dto.FileShareRequestDTO;
@@ -63,7 +64,7 @@ public class FilesAccess {
 			@ApiResponse(code = 404, message = "Plik nie istnieje")
 	})
 	public ResponseEntity<?> getFile(@PathVariable int id, HttpServletRequest req, HttpServletResponse resp) {
-		String username = getUsernameFromJwt(req);
+		String username = jwtUtils.extractUsername(req);
 		if (!fileRepository.hasAccess(id, username)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
@@ -99,24 +100,39 @@ public class FilesAccess {
 	public ResponseEntity<?> grantAccessToFile(@RequestBody FileShareRequestDTO fileShareRequest, HttpServletRequest req) {
 		String username = jwtUtils.extractUsername(req);
 		try {
-			fileRepository.grantAccess(fileShareRequest.getFileId(),username,fileShareRequest.getUsername());
+			fileRepository.grantAccess(fileShareRequest.getFileId(), username, fileShareRequest.getUsername());
 			return ResponseEntity.ok("Ok");
 		} catch (PermissionDeniedException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz dostępu do tego pliku");
-		}catch (UsernameNotFoundException e){
+		} catch (UsernameNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik nie istnieje");
+		} catch (FileDoesNotExistException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Plik nie istnieje");
 		}
 	}
 
 	@PostMapping("/files/revokeaccess")
 	public ResponseEntity<?> revokeAccessToFile(@RequestBody RevokeAccessToFileRequestDTO revokeRequest, HttpServletRequest req) {
-		String owner = getUsernameFromJwt(req);
-
-		//todo
+		String owner = jwtUtils.extractUsername(req);
+		System.out.println(revokeRequest);
+		try {
+			fileRepository.revokeAccess(revokeRequest.getFileId(), owner, revokeRequest.getUsername());
+		} catch (FileDoesNotExistException | UsernameNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 		return null;
 	}
 
-	private String getUsernameFromJwt(HttpServletRequest req) {
-		return jwtUtils.getUsername(req.getHeader("Authorization").substring(7));
+	@GetMapping("/files/shared/mine")
+	@ApiOperation(value = "Zwraca listę udostępninoych przez użytkownika plkiów razem z listą osób dla których są te pliki udostępnione")
+	public ResponseEntity getAllUsersSharedFiles(HttpServletRequest req){
+		List<FileSharedByUserDTO> res = fileRepository.getAllUsersShardFiles(jwtUtils.extractUsername(req));
+		return ResponseEntity.ok(res);
+	}
+
+	@GetMapping("/files/shared/forme")
+	@ApiOperation(value = "Zwraca listęp plików udostępnionych dla użytkownika przez innych")
+	public ResponseEntity getAllFilesSharedForUser(HttpServletRequest req){
+		return ResponseEntity.ok(fileRepository.getAllFilesSharedForUser(jwtUtils.extractUsername(req)));
 	}
 }

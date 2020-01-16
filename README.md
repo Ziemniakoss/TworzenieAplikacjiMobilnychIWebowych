@@ -66,3 +66,7 @@ Aktualnie obsługiwane są
     - nie może zawierać specjalnych znaków takich jak /<>{}'
 - Po niepoprawnej próbie logowania podawana jest jedynie inforamcja, że dane nie były poprawne ale nie
 jest stwierdzane czy to nazwa użytkownika była niepoprawna czy hasło  
+
+TODO
+- możliwość zmiany hasła
+- udostępnianie publiczne plików

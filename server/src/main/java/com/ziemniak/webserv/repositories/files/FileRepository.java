@@ -1,22 +1,29 @@
 package com.ziemniak.webserv.repositories.files;
 
+import com.ziemniak.webserv.dto.FileSharedByUserDTO;
+import com.ziemniak.webserv.dto.FileSharedForUserDTO;
 import com.ziemniak.webserv.repositories.users.UserDoesNotExistException;
 import com.ziemniak.webserv.repositories.users.UserRepository;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.TypeMismatchDataAccessException;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SqlInOutParameter;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,32 +35,48 @@ public class FileRepository {
 	@Autowired
 	private UserRepository userRepository;
 
-	public boolean hasAccess(int fileId, String username) {
-		if (isOwner(fileId, username)) {
-			return true;
-		}
+	public boolean hasAccess(int fileId, String username) {//todo zamienic na procedurę
 		return jdbcTemplate.queryForObject(
-				"SELECT EXISTS(SELECT FROM shared_files WHERE file_id = ? " +
+				"SELECT EXISTS(SELECT file_id FROM shared_files WHERE file_id = ? " +
 						"AND shared_to = (SELECT id FROM users WHERE username = ?))", Boolean.class, fileId, username);
 	}
 
-	public void revokeAccess(int fileId, String owner, String user) throws PermissionDeniedException {
-		if (!isOwner(fileId, owner)) {
-			throw new PermissionDeniedException();
+	public void revokeAccess(int fileId, String owner, String user) throws FileDoesNotExistException,UsernameNotFoundException {
+		try {
+			String sql = "SELECT revoke_access(?,?,?);";
+			jdbcTemplate.queryForObject(sql, new Object[]{fileId, owner, user}, (rs, rn) -> null);
+			log.info(String.format("%s revoked access to file %d for user %s", owner, fileId, user));
+		} catch (UncategorizedSQLException e) {
+			String message = e.getMostSpecificCause().getMessage();
+			System.err.println(message);
+			if (message.contains("File does not exists")) {
+				throw new FileDoesNotExistException(fileId);
+			} else if (message.contains("User does not exists")) {
+				throw new UsernameNotFoundException("owner");
+			} else if (message.contains("User to revoke does not exists")) {
+				throw new UsernameNotFoundException("revoker");
+			}
+		} catch (TypeMismatchDataAccessException ignored) {
 		}
-		// TODO: 07.01.2020
-
 	}
 
-	public void grantAccess(int fileId, String owner, String user) throws PermissionDeniedException {
-		if (!isOwner(fileId, owner)) {
-			throw new PermissionDeniedException();
+	public void grantAccess(int fileId, String owner, String user) throws PermissionDeniedException, FileDoesNotExistException {
+		try {
+			String sql = "Select grant_access(?,?,?)";
+			jdbcTemplate.query(sql, new Object[]{fileId, owner, user}, (rs, rn) -> null);
+		} catch (UncategorizedSQLException e) {
+			String message = e.getMostSpecificCause().getMessage();
+			if (message.contains("File does not exits")) {
+				throw new FileDoesNotExistException(fileId);
+			} else if (message.contains("User does not exists")) {
+				throw new UsernameNotFoundException("owner");
+			} else if (message.contains("User to revoke does not exists")) {
+				throw new UsernameNotFoundException("revoker");
+			} else if (message.contains("Not a owner")) {
+				throw new PermissionDeniedException();
+			}
+			log.error(message);
 		}
-		if (hasAccess(fileId, user)) {
-			return;//Już ma uprawnienia
-		}
-		int userId = userRepository.getUserId(user);
-		jdbcTemplate.update("INSERT INTO shared_files (file_id, user_id) VALUES (?,?);",fileId,userId);
 	}
 
 	public void saveFile(String owner, MultipartFile file) {
@@ -91,7 +114,7 @@ public class FileRepository {
 		if (username == null) {
 			return false;
 		}
-		String sql = "SELECT ((SELECT owner_id FROM files WHERE id = ?) = (SELECT id FROM users WHERE username = ?))";
+		String sql = "SELECT EXISTS (SELECT id FROM files WHERE id = ? AND owner = (SELECT id FROM users WHERE username = ?))";
 		return jdbcTemplate.queryForObject(sql, new Object[]{fileId, username}, Boolean.class);
 	}
 
@@ -124,13 +147,36 @@ public class FileRepository {
 				});
 	}
 
-	public List<FileInfo> getAllSharedFilesInfo(String username) {
-		int id = userRepository.getUserId(username);
-		String sql = "SELECT f.name as \"name\" f.id as \"id\" " +
-				" FROM shared_files sf " +
-				" JOIN files f on f.id = sf.file_id " +
-				" WHERE owner = ?";
-		return jdbcTemplate.query(sql, new Object[]{id},
-				(resultSet, i) -> new FileInfo(resultSet.getInt("id"), resultSet.getString("name")));
+	public List<FileSharedByUserDTO> getAllUsersShardFiles(String username){
+		try{
+			return jdbcTemplate.query("SELECT * FROM get_all_shared_files(?);",new Object[]{username},(rs, rowNum) -> {
+				FileSharedByUserDTO file = new FileSharedByUserDTO();
+				file.setId(rs.getInt("id"));
+				file.setName(rs.getString("name"));
+				JSONArray jsonArray = new JSONArray(rs.getString("shared_to"));
+				List<String> s = new ArrayList<>();
+				for(int i = 0; i < jsonArray.length(); i++){
+					s.add(jsonArray.getString(i));
+				}
+				file.setSharedTo(s);
+				return file;
+			});
+		}catch (UncategorizedSQLException e){
+			//Nie ma użytkonwnika
+			throw new UsernameNotFoundException(username);
+		}
 	}
+
+	public List<FileSharedForUserDTO> getAllFilesSharedForUser(String username){
+		return jdbcTemplate.query("SELECT * FROM get_all_shared_to(?)",
+				new Object[]{username}, (rs, rowNum) -> {
+					FileSharedForUserDTO file = new FileSharedForUserDTO();
+					file.setName(rs.getString("name"));
+					file.setId(rs.getInt("id"));
+					//todo data
+					file.setOwner(rs.getString("owner"));
+					return file;
+				});
+	}
+
 }

@@ -25,4 +25,12 @@ public class RevokeAccessToFileRequestDTO {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+
+	@Override
+	public String toString() {
+		return "RevokeAccessToFileRequestDTO{" +
+				"fileId=" + fileId +
+				", username='" + username + '\'' +
+				'}';
+	}
 }
