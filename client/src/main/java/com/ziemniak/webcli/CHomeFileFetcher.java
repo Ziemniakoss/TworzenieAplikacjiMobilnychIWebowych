@@ -44,6 +44,7 @@ public class CHomeFileFetcher {
 			return ResponseEntity.ok(res);
 		}catch (RestClientException e){
 			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		return null;
 	}

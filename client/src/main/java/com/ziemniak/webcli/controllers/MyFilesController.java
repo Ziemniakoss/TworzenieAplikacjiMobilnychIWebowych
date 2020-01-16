@@ -18,8 +18,6 @@ public class MyFilesController {
         if ("".equals(jwt)) {
             return "redirect:/login";
         }
-        //Pobieramy liste publikacji
-
         File[] files = fetchFileList(jwt);
         model.addAttribute("fileList", files);
         return "myfiles";
@@ -35,5 +33,4 @@ public class MyFilesController {
         ResponseEntity<File[]> response = rt.exchange(url, HttpMethod.GET, entity, com.ziemniak.webcli.File[].class, new HashMap<>());
         return response.getBody();
     }
-
 }

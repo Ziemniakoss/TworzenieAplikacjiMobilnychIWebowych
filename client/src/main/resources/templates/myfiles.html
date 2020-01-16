@@ -33,9 +33,10 @@
 		<td th:text="${file.creationDate}"></td>
 		<td th:text="${file.extension}"></td>
 		<td>
-			<form th:action="@{'/filefetcher/' + ${file.id}}" method="get">
-				<input type="submit" value="Pobierz">
-			</form>
+			<a th:href="@{'/myfiles/download/' + ${file.id}}" target="_blank">Pobierz?</a>
+<!--			<form th:action="@{'/myfiles/download/' + ${file.id}}" method="get">-->
+<!--				<input type="submit" value="Pobierz">-->
+<!--			</form>-->
 		</td>
 		<td>
 			<form th:action="${'/sharefile/'} + ${file.id}" method="get">

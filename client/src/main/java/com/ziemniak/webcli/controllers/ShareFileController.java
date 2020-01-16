@@ -1,12 +1,9 @@
 package com.ziemniak.webcli.controllers;
 
-import com.ziemniak.webcli.File;
 import com.ziemniak.webcli.dto.ShareFileRequestDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Controller
 public class ShareFileController {
@@ -30,6 +27,7 @@ public class ShareFileController {
 		}
 
 		//todo wysłać teraz na strone
+		return "redirect:/myfiles";
 	}
 
 

@@ -35,13 +35,8 @@ public class FileRepository {
 	@Autowired
 	private UserRepository userRepository;
 
-	public boolean hasAccess(int fileId, String username) {//todo zamienic na procedurę
-		return jdbcTemplate.queryForObject(
-				"SELECT EXISTS(SELECT file_id FROM shared_files WHERE file_id = ? " +
-						"AND shared_to = (SELECT id FROM users WHERE username = ?))", Boolean.class, fileId, username);
-	}
 
-	public void revokeAccess(int fileId, String owner, String user) throws FileDoesNotExistException,UsernameNotFoundException {
+	public void revokeAccess(int fileId, String owner, String user) throws FileDoesNotExistException, UsernameNotFoundException {
 		try {
 			String sql = "SELECT revoke_access(?,?,?);";
 			jdbcTemplate.queryForObject(sql, new Object[]{fileId, owner, user}, (rs, rn) -> null);
@@ -56,7 +51,6 @@ public class FileRepository {
 			} else if (message.contains("User to revoke does not exists")) {
 				throw new UsernameNotFoundException("revoker");
 			}
-		} catch (TypeMismatchDataAccessException ignored) {
 		}
 	}
 
@@ -118,11 +112,19 @@ public class FileRepository {
 		return jdbcTemplate.queryForObject(sql, new Object[]{fileId, username}, Boolean.class);
 	}
 
-	public byte[] getFile(int id) throws FileDoesNotExistException {
-		if (!exists(id)) {
-			throw new FileDoesNotExistException(id);
+	public byte[] getFile(int id, String username) throws FileDoesNotExistException, PermissionDeniedException {
+		try {
+			return jdbcTemplate.queryForObject("SELECT * FROM fetch_file(?,?)",byte [].class, id, username );
+		}catch (UncategorizedSQLException e){
+			String message = e.getMostSpecificCause().getMessage();
+			if(message.contains("File")){
+				throw new FileDoesNotExistException(id);
+			}else if(message.contains("User")){
+				throw new UsernameNotFoundException(username);
+			}else {
+				throw new PermissionDeniedException();
+			}
 		}
-		return jdbcTemplate.queryForObject("SELECT file FROM files WHERE id = ?", (rs, rw) -> rs.getBytes("file"), id);
 	}
 
 	public boolean exists(int fileId) {
@@ -147,27 +149,27 @@ public class FileRepository {
 				});
 	}
 
-	public List<FileSharedByUserDTO> getAllUsersShardFiles(String username){
-		try{
-			return jdbcTemplate.query("SELECT * FROM get_all_shared_files(?);",new Object[]{username},(rs, rowNum) -> {
+	public List<FileSharedByUserDTO> getAllUsersShardFiles(String username) {
+		try {
+			return jdbcTemplate.query("SELECT * FROM get_all_shared_files(?);", new Object[]{username}, (rs, rowNum) -> {
 				FileSharedByUserDTO file = new FileSharedByUserDTO();
 				file.setId(rs.getInt("id"));
 				file.setName(rs.getString("name"));
 				JSONArray jsonArray = new JSONArray(rs.getString("shared_to"));
 				List<String> s = new ArrayList<>();
-				for(int i = 0; i < jsonArray.length(); i++){
+				for (int i = 0; i < jsonArray.length(); i++) {
 					s.add(jsonArray.getString(i));
 				}
 				file.setSharedTo(s);
 				return file;
 			});
-		}catch (UncategorizedSQLException e){
+		} catch (UncategorizedSQLException e) {
 			//Nie ma użytkonwnika
 			throw new UsernameNotFoundException(username);
 		}
 	}
 
-	public List<FileSharedForUserDTO> getAllFilesSharedForUser(String username){
+	public List<FileSharedForUserDTO> getAllFilesSharedForUser(String username) {
 		return jdbcTemplate.query("SELECT * FROM get_all_shared_to(?)",
 				new Object[]{username}, (rs, rowNum) -> {
 					FileSharedForUserDTO file = new FileSharedForUserDTO();

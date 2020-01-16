@@ -32,14 +32,17 @@ import java.util.List;
 @RestController
 @Api(description = "Pozwala na pobieranie i udostępnianie plików")
 public class FilesAccess {
-	@Autowired
-	private JwtUtils jwtUtils;
-	@Autowired
-	private FileRepository fileRepository;
-	@Autowired
-	private UserRepository userRepository;
+	private final JwtUtils jwtUtils;
+	private final FileRepository fileRepository;
+
 
 	private final Logger log = LoggerFactory.getLogger(FilesAccess.class);
+
+	@Autowired
+	public FilesAccess(JwtUtils jwtUtils, FileRepository fileRepository) {
+		this.jwtUtils = jwtUtils;
+		this.fileRepository = fileRepository;
+	}
 
 	@PostMapping(value = "/files/add", produces = "application/json")
 	@ApiOperation(value = "Tworzy nowy plik w bazie danych")
@@ -65,16 +68,18 @@ public class FilesAccess {
 	})
 	public ResponseEntity<?> getFile(@PathVariable int id, HttpServletRequest req, HttpServletResponse resp) {
 		String username = jwtUtils.extractUsername(req);
-		if (!fileRepository.hasAccess(id, username)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
-
+		log.info("User " + username + " is trying to download file " + id);
 		try {
-			byte[] file = fileRepository.getFile(id);
+			byte[] file = fileRepository.getFile(id, username);
 			resp.setHeader("Content-disposition", "attachment; filename=test");//todo faktyczna nazwa
+			log.info("Sending file " + id + " to " + username);
 			return ResponseEntity.ok(file);
 		} catch (FileDoesNotExistException e) {
+			log.warn("User " + username + " tried to download non existing file " + id);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		} catch (PermissionDeniedException e) {
+			log.warn("USer " + username + " tried to access  file " + id + " to which he has no permissions");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 	}
 
@@ -125,14 +130,14 @@ public class FilesAccess {
 
 	@GetMapping("/files/shared/mine")
 	@ApiOperation(value = "Zwraca listę udostępninoych przez użytkownika plkiów razem z listą osób dla których są te pliki udostępnione")
-	public ResponseEntity getAllUsersSharedFiles(HttpServletRequest req){
+	public ResponseEntity getAllUsersSharedFiles(HttpServletRequest req) {
 		List<FileSharedByUserDTO> res = fileRepository.getAllUsersShardFiles(jwtUtils.extractUsername(req));
 		return ResponseEntity.ok(res);
 	}
 
 	@GetMapping("/files/shared/forme")
 	@ApiOperation(value = "Zwraca listęp plików udostępnionych dla użytkownika przez innych")
-	public ResponseEntity getAllFilesSharedForUser(HttpServletRequest req){
+	public ResponseEntity getAllFilesSharedForUser(HttpServletRequest req) {
 		return ResponseEntity.ok(fileRepository.getAllFilesSharedForUser(jwtUtils.extractUsername(req)));
 	}
 }
