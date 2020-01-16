@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Controller
@@ -38,8 +39,12 @@ public class ShareFileController {
 		headers.add("Authorization","Bearer "+jwt);
 		HttpEntity entity = new HttpEntity(request,headers);
 		String url = ClientApplication.URL_TO_SERVER+"/files/share";
-		rt.exchange(url, HttpMethod.POST,entity,String.class);
-		log.info("User shared file "+request.getFileId()+" to user "+ request.getUsername());
+		try {
+			rt.exchange(url, HttpMethod.POST,entity,String.class);
+			log.info("User shared file " + request.getFileId() + " to user " + request.getUsername());
+		}catch (HttpClientErrorException e){
+			return "redirect:/error/404";
+		}
 
 		return "redirect:/myfiles/shared";
 	}

@@ -1,11 +1,8 @@
 package com.ziemniak.webserv.controllers;
 
-import com.ziemniak.webserv.dto.FileSharedByUserDTO;
+import com.ziemniak.webserv.dto.*;
 import com.ziemniak.webserv.repositories.files.FileDoesNotExistException;
 import com.ziemniak.webserv.repositories.files.FileInfo;
-import com.ziemniak.webserv.dto.FileShareRequestDTO;
-import com.ziemniak.webserv.dto.FileUploadPositiveResponseDTO;
-import com.ziemniak.webserv.dto.RevokeAccessToFileRequestDTO;
 import com.ziemniak.webserv.repositories.files.FileRepository;
 import com.ziemniak.webserv.repositories.files.PermissionDeniedException;
 import com.ziemniak.webserv.repositories.users.UserDoesNotExistException;
@@ -50,12 +47,11 @@ public class FilesAccess {
 			@ApiResponse(code = 200, message = "Plik został zapisany", response = FileUploadPositiveResponseDTO.class),
 			@ApiResponse(code = 403, message = "Żądanie nie zawierało nagłówka z jwt")
 	})
-	public ResponseEntity add(@RequestParam("file") MultipartFile file, @RequestParam("fileName") String filename, HttpServletRequest req) {
+	public ResponseEntity add(@RequestBody FileUploadDTO file,  HttpServletRequest req) {
 		String username = jwtUtils.getUsername(req.getHeader("Authorization").substring(7));
 		log.info('"' + username + "\" is adding file " + file.getName());
-		fileRepository.saveFile(username, file);
-		log.info(username + " added  file " + file.getName());
-		return new ResponseEntity<>(new FileUploadPositiveResponseDTO(file.getName()), HttpStatus.OK);
+		fileRepository.saveFile(username, file.getFile(), file.getName());
+		return new ResponseEntity<>("ok", HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/files/get/{id}")

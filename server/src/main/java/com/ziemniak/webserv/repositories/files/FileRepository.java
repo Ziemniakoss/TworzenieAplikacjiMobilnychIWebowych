@@ -73,7 +73,7 @@ public class FileRepository {
 		}
 	}
 
-	public void saveFile(String owner, MultipartFile file) {
+	public void saveFile(String owner, byte[] file, String fileName) {
 		String sql = "\n" +
 				"INSERT INTO files (owner, name, file) VALUES " +
 				"((SELECT id FROM users WHERE username = ?), ?, ?)";
@@ -82,17 +82,13 @@ public class FileRepository {
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
 				PreparedStatement ps = connection.prepareStatement(sql);
 				ps.setString(1, owner);
-				ps.setString(2, file.getName());
-				try {
-					ps.setBinaryStream(3, file.getInputStream());
-				} catch (IOException e) {
-					throw new SQLException("Creation of stream failed: " + e.getMessage());
-				}
+				ps.setString(2, fileName);
+				ps.setBytes(3, file);
 				return ps;
 			}
 		};
 		jdbcTemplate.update(creator);
-		log.info(owner + " added new file " + file.getName());
+		log.info(owner + " added new file " +fileName);
 	}
 
 	public void deleteFile(int id, String owner) throws PermissionDeniedException {
@@ -114,14 +110,14 @@ public class FileRepository {
 
 	public byte[] getFile(int id, String username) throws FileDoesNotExistException, PermissionDeniedException {
 		try {
-			return jdbcTemplate.queryForObject("SELECT * FROM fetch_file(?,?)",byte [].class, id, username );
-		}catch (UncategorizedSQLException e){
+			return jdbcTemplate.queryForObject("SELECT * FROM fetch_file(?,?)", byte[].class, id, username);
+		} catch (UncategorizedSQLException e) {
 			String message = e.getMostSpecificCause().getMessage();
-			if(message.contains("File")){
+			if (message.contains("File")) {
 				throw new FileDoesNotExistException(id);
-			}else if(message.contains("User")){
+			} else if (message.contains("User")) {
 				throw new UsernameNotFoundException(username);
-			}else {
+			} else {
 				throw new PermissionDeniedException();
 			}
 		}
