@@ -88,7 +88,7 @@ public class FileRepository {
 			}
 		};
 		jdbcTemplate.update(creator);
-		log.info(owner + " added new file " +fileName);
+		log.info(owner + " added new file " + fileName);
 	}
 
 	public void deleteFile(int id, String owner) throws PermissionDeniedException {
@@ -143,6 +143,10 @@ public class FileRepository {
 					file.setCreationDate(resultSet.getTimestamp("creation_date"));
 					return file;
 				});
+	}
+
+	public String getFileName(int id) {
+		return jdbcTemplate.queryForObject("SELECT id FROM files WHERE id = ?;", String.class, id);
 	}
 
 	public List<FileSharedByUserDTO> getAllUsersShardFiles(String username) {

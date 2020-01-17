@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="pl" xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Udostępnione dla mnie</title>
+	<link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+<header th:insert="header"></header>
+<nav th:insert="navbar"></nav>
+<main>
+	<table th:if="${files != null}">
+		<tr th:each="file : ${files}">
+			<td th:text="${file.name}"></td>
+			<td th:text="${file.creationDate}"></td>
+			<td th:text="${file.owner}"></td>
+			<td>
+				<form th:action="${'/myfiles/download/'} + ${file.id}" method="get">
+					<input type="submit" value="Pobierz">
+				</form>
+			</td>
+
+		</tr>
+	</table>
+</main>
+<footer th:insert="footer"></footer>
+</body>
+</html>

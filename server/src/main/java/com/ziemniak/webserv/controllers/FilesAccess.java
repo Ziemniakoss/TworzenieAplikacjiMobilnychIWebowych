@@ -67,7 +67,7 @@ public class FilesAccess {
 		log.info("User " + username + " is trying to download file " + id);
 		try {
 			byte[] file = fileRepository.getFile(id, username);
-			resp.setHeader("Content-disposition", "attachment; filename=test");//todo faktyczna nazwa
+			resp.setHeader("Content-disposition", "attachment; filename="+fileRepository.getFileName(id));//todo faktyczna nazwa
 			log.info("Sending file " + id + " to " + username);
 			return ResponseEntity.ok(file);
 		} catch (FileDoesNotExistException e) {
