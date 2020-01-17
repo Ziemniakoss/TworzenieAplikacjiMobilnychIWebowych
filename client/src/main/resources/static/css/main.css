@@ -1,39 +1,55 @@
-body{
-	background-color: black;
-	color: white;
-}
-input{
-    background-color: black;
-    color: white;
-    padding: 5px 5px;
-    margin: 5px 5px;
-}
-
-header{
-    background-color: #000099;
-    color: #b3b3b3;
-}
-
-.error{
-    background-color: red;
-    color: black;
-    padding: 5px 5px;
-    margin: 5px 5px;
-}
-.contact{
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.file-table{
-	margin-left: auto;
-	margin-right: auto;
-	width: 100%;
-}
-
 footer{
 	position: fixed;
 	bottom: 0;
 	width: 100%;
-	background: blue;
+}
+
+ul.nav-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: #333;
+	width: 100%;
+}
+
+li.nav-list {
+	float: left;
+	color: white;
+	margin: 10px;
+}
+
+li a.nav-list {
+	display: block;
+	color: white;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+}
+
+
+li a:hover.nav-list {
+	background-color: #111;
+}
+
+ul.error{
+	background-color: darkred;
+	color: #111111;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+
+}
+
+li.error{
+	background-color: darkred;
+	color: #111111;
+}
+
+td.shared-files-name{
+	vertical-align: top;
+}
+table.shared-files{
+	border: 1px solid #111111;
 }

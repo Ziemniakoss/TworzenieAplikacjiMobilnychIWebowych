@@ -3,9 +3,9 @@ package com.ziemniak.webcli.dto;
 import javax.validation.constraints.NotBlank;
 
 public class LoginRequestDTO {
-	@NotBlank(message = "Please enter your username")
+	@NotBlank(message = "Proszę podać login")
 	private String username;
-	@NotBlank(message = "Please enter password")
+	@NotBlank(message = "Proszę podać hasło")
 	private String password;
 
 	public String getUsername() {

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
@@ -36,11 +37,16 @@ public class CHomeFileFetcher {
 		headers.set("Authorization", "Bearer " + jwt);
 
 		HttpEntity httpEntity = new HttpEntity("", headers);
-		Resource res = rt.exchange(url, HttpMethod.GET, httpEntity, Resource.class).getBody();
-		Path path = FileUtils.saveTemp(res);
-
-		res = new FileSystemResource(path);
-		return ResponseEntity.ok(res);
+		try {
+			Resource res = rt.exchange(url, HttpMethod.GET, httpEntity, Resource.class).getBody();
+			Path path = FileUtils.saveTemp(res);
+			res = new FileSystemResource(path);
+			return ResponseEntity.ok(res);
+		}catch (RestClientException e){
+			e.printStackTrace();
+			System.err.println(e.getMessage());
+		}
+		return null;
 	}
 
 }

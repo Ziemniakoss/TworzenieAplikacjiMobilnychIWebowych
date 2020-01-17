@@ -48,12 +48,7 @@ public class CHome {
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", "Bearer " + jwt);
-
-
-
-
-
-		return "home";
+		return "redirect:/myfiles";
 	}
 
 

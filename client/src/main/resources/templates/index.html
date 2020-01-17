@@ -1,30 +1,24 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="pl" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
-	<meta charset="UTF-8">
-	<title>Witamy w BiblioZiemniak</title>
-	<link href="../static/css/main.css" th:href="@{/css/main.css}" rel="stylesheet"/>
-
+    <meta charset="UTF-8">
+    <title>Witaj w biblioziem</title>
 </head>
 <body>
-<div th:insert="header">...</div>
-<main>
-	<h1>Witamy w BiblioZiemniak</h1>
-
-	<p>
-		Z nami zarządzanie biblografią jest proste
-	</p>
-	<table>
-		<tr>
-			<th>
-				<button type="button" onclick="window.location.href = '/register'">Zarejstruj się</button>
-			</th>
-			<th>
-				<button type="button" onclick="window.location.href = '/login'">Zaloguj</button>
-			</th>
-		</tr>
-	</table>
-</main>
-<div th:insert="footer">...</div>
+<h1>Witaj w BiblioZiem</h1>
+<p>
+    Aby kontynouwać załóż konto albo zaloguj się do isniejącego
+</p>
+<table>
+    <tr>
+        <th>
+            <button type="button" onclick="window.location.href = '/register'">Zarejestruj się</button>
+        </th>
+        <th>
+            <button type="button" onclick="window.location.href = '/login'">Zaloguj się</button>
+        </th>
+    </tr>
+</table>
 </body>
 </html>

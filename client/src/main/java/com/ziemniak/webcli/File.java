@@ -80,4 +80,14 @@ public class File {
 	public void setExtension(String extension) {
 		//Specjalne puste body
 	}
+
+	@Override
+	public String toString() {
+		return "File{" +
+				"name='" + name + '\'' +
+				", id='" + id + '\'' +
+				", extension='" + extension + '\'' +
+				", creationDate='" + creationDate + '\'' +
+				'}';
+	}
 }
