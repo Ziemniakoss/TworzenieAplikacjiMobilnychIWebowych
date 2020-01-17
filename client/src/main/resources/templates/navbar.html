@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+	<meta charset="UTF-8">
+	<link href="css/main.css" rel="stylesheet">
+</head>
+<body>
+<ul class="nav-list">
+	<a href="/myfiles">
+		<li class="nav-list"> Twoje pliki</li>
+	</a>
+	<a href="/bibliographies">
+		<li class="nav-list"> Twoje bibliografie</li>
+	</a>
+	<a href="/shared">
+		<li class="nav-list"> Udostępnione dla ciebie</li>
+	</a>
+	<a href="/myfiles/shared">
+		<li class="nav-list"> Twoje udostępnione pliki</li>
+	</a>
+</ul>
+<hr>
+<table>
+	<tr>
+		<td>Starczy na dziś?</td>
+		<td>
+			<form method="post" action="/logout">
+				<input type="submit" value="WYloguj sie?">
+			</form>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

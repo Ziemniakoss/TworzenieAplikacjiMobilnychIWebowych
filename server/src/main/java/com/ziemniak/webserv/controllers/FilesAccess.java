@@ -1,10 +1,8 @@
 package com.ziemniak.webserv.controllers;
 
+import com.ziemniak.webserv.dto.*;
 import com.ziemniak.webserv.repositories.files.FileDoesNotExistException;
 import com.ziemniak.webserv.repositories.files.FileInfo;
-import com.ziemniak.webserv.dto.FileShareRequestDTO;
-import com.ziemniak.webserv.dto.FileUploadPositiveResponseDTO;
-import com.ziemniak.webserv.dto.RevokeAccessToFileRequestDTO;
 import com.ziemniak.webserv.repositories.files.FileRepository;
 import com.ziemniak.webserv.repositories.files.PermissionDeniedException;
 import com.ziemniak.webserv.repositories.users.UserDoesNotExistException;
@@ -31,14 +29,17 @@ import java.util.List;
 @RestController
 @Api(description = "Pozwala na pobieranie i udostępnianie plików")
 public class FilesAccess {
-	@Autowired
-	private JwtUtils jwtUtils;
-	@Autowired
-	private FileRepository fileRepository;
-	@Autowired
-	private UserRepository userRepository;
+	private final JwtUtils jwtUtils;
+	private final FileRepository fileRepository;
+
 
 	private final Logger log = LoggerFactory.getLogger(FilesAccess.class);
+
+	@Autowired
+	public FilesAccess(JwtUtils jwtUtils, FileRepository fileRepository) {
+		this.jwtUtils = jwtUtils;
+		this.fileRepository = fileRepository;
+	}
 
 	@PostMapping(value = "/files/add", produces = "application/json")
 	@ApiOperation(value = "Tworzy nowy plik w bazie danych")
@@ -46,12 +47,11 @@ public class FilesAccess {
 			@ApiResponse(code = 200, message = "Plik został zapisany", response = FileUploadPositiveResponseDTO.class),
 			@ApiResponse(code = 403, message = "Żądanie nie zawierało nagłówka z jwt")
 	})
-	public ResponseEntity add(@RequestParam("file") MultipartFile file, @RequestParam("fileName") String filename, HttpServletRequest req) {
+	public ResponseEntity add(@RequestBody FileUploadDTO file,  HttpServletRequest req) {
 		String username = jwtUtils.getUsername(req.getHeader("Authorization").substring(7));
 		log.info('"' + username + "\" is adding file " + file.getName());
-		fileRepository.saveFile(username, file);
-		log.info(username + " added  file " + file.getName());
-		return new ResponseEntity<>(new FileUploadPositiveResponseDTO(file.getName()), HttpStatus.OK);
+		fileRepository.saveFile(username, file.getFile(), file.getName());
+		return new ResponseEntity<>("ok", HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/files/get/{id}")
@@ -63,17 +63,19 @@ public class FilesAccess {
 			@ApiResponse(code = 404, message = "Plik nie istnieje")
 	})
 	public ResponseEntity<?> getFile(@PathVariable int id, HttpServletRequest req, HttpServletResponse resp) {
-		String username = getUsernameFromJwt(req);
-		if (!fileRepository.hasAccess(id, username)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
-
+		String username = jwtUtils.extractUsername(req);
+		log.info("User " + username + " is trying to download file " + id);
 		try {
-			byte[] file = fileRepository.getFile(id);
-			resp.setHeader("Content-disposition", "attachment; filename=test");//todo faktyczna nazwa
+			byte[] file = fileRepository.getFile(id, username);
+			resp.setHeader("Content-disposition", "attachment; filename="+fileRepository.getFileName(id));//todo faktyczna nazwa
+			log.info("Sending file " + id + " to " + username);
 			return ResponseEntity.ok(file);
 		} catch (FileDoesNotExistException e) {
+			log.warn("User " + username + " tried to download non existing file " + id);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		} catch (PermissionDeniedException e) {
+			log.warn("USer " + username + " tried to access  file " + id + " to which he has no permissions");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 	}
 
@@ -99,24 +101,39 @@ public class FilesAccess {
 	public ResponseEntity<?> grantAccessToFile(@RequestBody FileShareRequestDTO fileShareRequest, HttpServletRequest req) {
 		String username = jwtUtils.extractUsername(req);
 		try {
-			fileRepository.grantAccess(fileShareRequest.getFileId(),username,fileShareRequest.getUsername());
+			fileRepository.grantAccess(fileShareRequest.getFileId(), username, fileShareRequest.getUsername());
 			return ResponseEntity.ok("Ok");
 		} catch (PermissionDeniedException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nie masz dostępu do tego pliku");
-		}catch (UsernameNotFoundException e){
+		} catch (UsernameNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Użytkownik nie istnieje");
+		} catch (FileDoesNotExistException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Plik nie istnieje");
 		}
 	}
 
 	@PostMapping("/files/revokeaccess")
 	public ResponseEntity<?> revokeAccessToFile(@RequestBody RevokeAccessToFileRequestDTO revokeRequest, HttpServletRequest req) {
-		String owner = getUsernameFromJwt(req);
-
-		//todo
+		String owner = jwtUtils.extractUsername(req);
+		System.out.println(revokeRequest);
+		try {
+			fileRepository.revokeAccess(revokeRequest.getFileId(), owner, revokeRequest.getUsername());
+		} catch (FileDoesNotExistException | UsernameNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 		return null;
 	}
 
-	private String getUsernameFromJwt(HttpServletRequest req) {
-		return jwtUtils.getUsername(req.getHeader("Authorization").substring(7));
+	@GetMapping("/files/shared/mine")
+	@ApiOperation(value = "Zwraca listę udostępninoych przez użytkownika plkiów razem z listą osób dla których są te pliki udostępnione")
+	public ResponseEntity getAllUsersSharedFiles(HttpServletRequest req) {
+		List<FileSharedByUserDTO> res = fileRepository.getAllUsersShardFiles(jwtUtils.extractUsername(req));
+		return ResponseEntity.ok(res);
+	}
+
+	@GetMapping("/files/shared/forme")
+	@ApiOperation(value = "Zwraca listęp plików udostępnionych dla użytkownika przez innych")
+	public ResponseEntity getAllFilesSharedForUser(HttpServletRequest req) {
+		return ResponseEntity.ok(fileRepository.getAllFilesSharedForUser(jwtUtils.extractUsername(req)));
 	}
 }

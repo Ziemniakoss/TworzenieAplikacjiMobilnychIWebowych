@@ -1,73 +1,53 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="pl" xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
-	<title>Rejstracja</title>
-	<link href="../static/css/main.css" th:href="@{/css/main.css}" rel="stylesheet"/>
+	<title>Zarejestruj się</title>
+	<link href="css/main.css" rel="stylesheet">
 </head>
+<header th:insert="header"></header>
 <body>
-<div th:insert="header">...</div>
-<main>
+<h1>Utwórz nowe konto</h1>
+<ul class="error" th:if="${errorList != null}">
+	<li class="error" th:each="error : ${errorList}" th:text="${error}">Error</li>
+</ul>
 
-	<h1>
-		Zarejstruj się do BibloZiem
-	</h1>
-
-	<div class="error" th:if="${errorlist != null}">
-		<p th:each="eli : ${errorlist}" th:text="${eli}">aaa</p>
-	</div>
-
-
-	<!--End of errors-->
-	<form id="register" method="post" th:object="${user}">
-		<div class="error" th:if="${#fields.hasErrors('*')}">
-			<p th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
-		</div>
-
-		<table>
-			<tr>
-				<td>
-					<label for="username">
-						Nazwa użykownika
-					</label>
-				</td>
-				<td>
-					<input type="text" id="username" name="username">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label for="password">
-						Hasło
-					</label>
-				</td>
-				<td>
-					<input type="password" id="password" name="password"/>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label for="validatePassword">
-						Potwierdź hasło
-					</label>
-				</td>
-				<td>
-					<input type="password" id="validatePassword" name="validatePassword">
-				</td>
-			</tr>
-			<tr>
-				<td colspan="3">
-					<input type="submit" value="Zarejstruj">
-				</td>
-			</tr>
-		</table>
-	</form>
-	<script th:src="@{/scripts/checking.js}"></script>
+<form id="register" method="post" th:object="${user}">
+	<table>
+		<tr>
+			<td>
+				<label for="username"> Nazwa użykownika </label>
+			</td>
+			<td>
+				<input type="text" id="username" name="username">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="password"> Hasło </label>
+			</td>
+			<td>
+				<input type="password" id="password" name="password"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="validatePassword"> Potwierdź hasło </label>
+			</td>
+			<td>
+				<input type="password" id="validatePassword" name="validatePassword">
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3">
+				<input type="submit" value="Zarejstruj">
+			</td>
+		</tr>
+	</table>
+</form>
 
 
-</main>
-<footer>
-	<div th:insert="footer">foot</div>
-</footer>
 </body>
+<footer th:insert="footer"></footer>
 </html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Udostępnij plik</title>
+</head>
+<footer th:insert="footer"></footer>
+<nav th:insert="navbar"></nav>
+<body>
+<h1>Udostępnij plik innemu użytkownikowi</h1>
+<p>
+	Po udostępnieniu użytkownik będzie mógł pobierać dany plik.
+	Użytkownik któremu udostępnisz swój plik nie będzie mógł go usunąć z naszej bazy danych
+	ani zmieniać jego zawartości.
+</p>
+<p>
+	Dostęp do pliku można cofnąć w każdej chwili!
+</p>
+<h3>Komu chesz udostępnić plik?</h3>
+<form method="post" action="" th:object="${req}" th:action="${'/sharefile'}">
+	<table>
+		<tbody>
+		<tr>
+			<td>
+				<input type="text" maxlength="30" name="username" placeholder="Nazwa użytkownika">
+			</td>
+			<td>
+				<input type="submit" value="Udostępnij">
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	<input type="hidden" th:value="${id}" name="fileId">
+</form>
+
+</body>
+<footer th:insert="footer"></footer>
+</html>

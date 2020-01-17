@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller allowing to register in system.
@@ -39,9 +43,20 @@ public class CRegister {
 
 	@PostMapping
 	public String registerUser(@Valid @ModelAttribute("user") RegisterRequestDTO registerRequest, Errors errors, Model model) {
-		log.info("Processing new register request");
 		if (errors.hasErrors()) {
 			log.warn("Register request had " + errors.getErrorCount() + " errors");
+			model.addAttribute("errorList", errors.getAllErrors().stream()
+					.map(ObjectError::getDefaultMessage)
+					.sorted((s1, s2) -> {
+						if(s1.length() > s2.length()){
+							return 1;
+						}else if(s1.length() == s2.length()){
+							return 0;
+						}else {
+							return -1;
+						}
+					})
+					.collect(Collectors.toList()));
 			return "register";
 		}
 		RegisterResponseDTO response;
@@ -53,17 +68,17 @@ public class CRegister {
 			HttpEntity<RegisterRequestDTO> e = new HttpEntity<>(registerRequest, headers);
 
 			response = rt.postForObject(url, e, RegisterResponseDTO.class);
-			if (response.isAccepted()) {
+			if (response.isAccepted()) {//todo można zalogować i przekierwać na stronę główną
 				return "redirect:/";
 			}
-			model.addAttribute("errorlist", response.getErrors());
+			model.addAttribute("errorList", response.getErrors());
 		} catch (HttpClientErrorException e) {
-			log.warn("There is already username with name "+registerRequest.getUsername());
 			if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
 				ObjectMapper mapper = new ObjectMapper();
 				try {
 					response = mapper.readValue(e.getResponseBodyAsString(), RegisterResponseDTO.class);
-					model.addAttribute("errorlist", response.getErrors());
+					System.out.println(String.join(" ", response.getErrors()));
+					model.addAttribute("errorList", response.getErrors());
 				} catch (JsonProcessingException ex) {
 					log.error("Error while parsing negative respones to register request: " + ex.getMessage());
 				}
