@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ClientApplication {
-	public static  String URL_TO_SERVER="http://localhost:42069";// "https://ziemback.herokuapp.com";
+	public static  String URL_TO_SERVER= "https://ziemback.herokuapp.com";
 
 	public static void main(String[] args) {
 
