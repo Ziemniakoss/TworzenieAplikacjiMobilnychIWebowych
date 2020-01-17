@@ -8,7 +8,6 @@ public class ClientApplication {
 	public static  String URL_TO_SERVER= "https://ziemback.herokuapp.com";
 
 	public static void main(String[] args) {
-
 		SpringApplication.run(ClientApplication.class, args);
 	}
 }

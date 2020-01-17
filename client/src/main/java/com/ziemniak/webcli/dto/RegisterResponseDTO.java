@@ -5,7 +5,7 @@ import java.util.List;
 public class RegisterResponseDTO {
 	private String username;
 	private boolean accepted;
-	private List<String> errors;
+	private String[] errors;
 
 	public String getUsername() {
 		return username;
@@ -23,11 +23,11 @@ public class RegisterResponseDTO {
 		this.accepted = accepted;
 	}
 
-	public List<String> getErrors() {
+	public String[] getErrors() {
 		return errors;
 	}
 
-	public void setErrors(List<String> errors) {
+	public void setErrors(String[] errors) {
 		this.errors = errors;
 	}
 }

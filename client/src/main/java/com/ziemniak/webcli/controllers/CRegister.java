@@ -65,7 +65,7 @@ public class CRegister {
 			RestTemplate rt = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			HttpEntity<RegisterRequestDTO> e = new HttpEntity<>(registerRequest, headers);
+			HttpEntity<RegisterRequestDTO> e = new HttpEntity(registerRequest, headers);
 
 			response = rt.postForObject(url, e, RegisterResponseDTO.class);
 			if (response.isAccepted()) {//todo można zalogować i przekierwać na stronę główną

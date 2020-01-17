@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class UserRepository {
@@ -34,10 +35,23 @@ public class UserRepository {
 		jdbcTemplate.update(sql, username, hash);
 	}
 
-	public void changePassword(User u, String passwordPlain) throws PasswordValidationException, UserDoesNotExistException {
-		passwordUtils.validate(passwordPlain);
-		//todo
-
+	public void changePassword(User u, String oldPassword, String newPassword, String validateNewPassword) throws PasswordValidationException {
+		List<String> errors = new ArrayList<>();
+		if(!passwordEncoder.matches(oldPassword,u.getPassword())){
+			errors.add("Stare hasło jest niepoprawne");
+		}
+		if(!newPassword.equals(validateNewPassword)){
+			errors.add("Hasła się nie zgadzają");
+		}
+		try{
+			passwordUtils.validate(newPassword);
+		}catch (PasswordValidationException e){
+			errors.addAll(e.getErrors());
+		}
+		if(!errors.isEmpty()){
+			throw new PasswordValidationException(errors);
+		}
+		jdbcTemplate.query("SELECT '' FROM change_password(?,?)",new Object[]{u.getUsername(),passwordEncoder.encode(newPassword)},(rs,rn)->null);
 	}
 
 	public User getUser(String username) throws UsernameNotFoundException {

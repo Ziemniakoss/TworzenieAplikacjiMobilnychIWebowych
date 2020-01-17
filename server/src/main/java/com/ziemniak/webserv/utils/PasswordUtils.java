@@ -13,7 +13,6 @@ public class PasswordUtils {
 	private PasswordEncoder encoder;
 	@Autowired
 	private WeakPasswordsRepository weakPasswordsRepository;
-	private String specialCharacters = "~`!@#$%^&*()_+{}[];':\"\\|<>,.?/";
 
 	public String encode(String plain) {
 		if (plain == null) {
@@ -87,7 +86,6 @@ public class PasswordUtils {
 		boolean containsUpperCase = false;
 		boolean containsLowerCase = false;
 		boolean containsNumber = false;
-		boolean containsSpecial = false;
 		for(char c : password.toCharArray()){
 			if(Character.isDigit(c)){
 				containsNumber = true;
@@ -97,9 +95,6 @@ public class PasswordUtils {
 			}
 			if(Character.isLowerCase(c)){
 				containsLowerCase = true;
-			}
-			if(specialCharacters.indexOf(c) != -1){
-				containsSpecial = true;
 			}
 		}
 		if(!containsLowerCase){
@@ -111,19 +106,12 @@ public class PasswordUtils {
 		if(!containsNumber){
 			errors.add("Hasło nie zawiera liczby");
 		}
-		if(!containsSpecial){
-			errors.add("Hasło nie zawiera zanku specjalnego");
-		}
 		if(isWeak(password)){
 			errors.add("Hasło jest w rejestrze haseł słabych");
 		}
-		double entropy = calculateEntropy(password);
-		if(entropy < 15){
-			errors.add("Hasło ma zdecydowanie za małą entropię");
-		}
 
 		if(!errors.isEmpty()){
-			throw new PasswordValidationException(entropy,errors);
+			throw new PasswordValidationException(errors);
 		}
 	}
 }

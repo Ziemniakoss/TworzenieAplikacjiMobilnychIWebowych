@@ -18,7 +18,6 @@ public class RegisterRequestDTO {
 	@Pattern(regexp = ".*\\p{javaUpperCase}.*", message = "Hasło musi zawierać przynajmniej jedną wielką literę")
 	@Pattern(regexp = ".*\\p{javaDigit}.*", message = "Hasło musi zawierać przynajmniej jedną cyfrę")
 	@Pattern(regexp = ".*\\p{javaLowerCase}.*", message = "Hasło musi zawierać przynajmniej jedną małą literę")
-	@Pattern(regexp = "[^[!@#$%^&*()<>:\";']]*", message = "Wiadomość nie może zawrierać znaków specjalnych !@#$%^&*()<>:\";'")
 	private String password;
 
 	@NotBlank(message = "Proszę potwierdzić hasło")
